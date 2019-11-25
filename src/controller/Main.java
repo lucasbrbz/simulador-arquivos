@@ -25,8 +25,8 @@ public class Main {
 		return tabelaNodes;
 	}
 	
-//	public void configuraDisco(HD discoArquivo) {
-//		 disco = discoArquivo;
-//	}
+	public static void configuraDisco(Object discoArquivo) {
+		 disco = (HD) discoArquivo;
+	}
 
 }
