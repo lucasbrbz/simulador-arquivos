@@ -15,6 +15,8 @@ public class Main {
 
 	public static void main(String[] args) {
 		principalView.setVisible(true);
+//		System.out.println(disco.getTamanho());
+//		System.out.println(disco.getTamanhoBloco());
 	}
 	
 	public static HD getDisco() {

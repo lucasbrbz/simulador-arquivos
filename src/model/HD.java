@@ -17,8 +17,16 @@ public class HD implements Serializable {
 		return disco;
 	}
 	
+	public int getTamanho() {
+		return tamanho;
+	}
+	
 	public void setTamanho(int tamanho) {
 		this.tamanho = tamanho;
+	}
+	
+	public int getTamanhoBloco() {
+		return tBloco;
 	}
 	
 	public void setTamanhoBloco(int tBloco) {

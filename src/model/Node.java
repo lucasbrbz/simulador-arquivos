@@ -14,8 +14,9 @@ public class Node {
 		Calendar c = Calendar.getInstance();
 		this.tamanho = tamanho;
 		this.permissao = permissao;
-		this.datacriacao = c.get(Calendar.DATE) + "/" + c.get(Calendar.MONTH) + "/" + c.get(Calendar.YEAR);
+		this.datacriacao = c.get(Calendar.DATE) + "/" + (c.get(Calendar.MONTH)+1) + "/" + c.get(Calendar.YEAR);
 		this.ultimamodificacao = this.datacriacao;
+		this.id = nINodes;
 	}
 	
 	public void setReferencias(int[] referencias) {
@@ -37,5 +38,14 @@ public class Node {
 	public static void addNode() {
 		nINodes++;
 	}
+	
+	public String getDataCriacao() {
+		return datacriacao;
+	}
+	
+	public String getDataModificacao() {
+		return ultimamodificacao;
+	}
+	
 	
 }
