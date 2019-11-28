@@ -1,7 +1,7 @@
 package model;
 
 public class Bloco {
-	private int posicao;
+	private int endereco;
 	
 	public Bloco() {
 		

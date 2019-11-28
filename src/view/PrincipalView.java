@@ -27,7 +27,6 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.JTable;
-import javax.swing.UIManager;
 import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.JTextField;
@@ -173,9 +172,6 @@ public class PrincipalView extends JFrame {
 					Main.getTabela().remove(arq);
 					arq.delete();
 					JOptionPane.showMessageDialog(null, "Arquivo removido com sucesso!", "Remover arquivo", JOptionPane.INFORMATION_MESSAGE);
-					for(File f : Main.getTabela().keySet()) {
-						System.out.println(f.getName());
-					}
 					atualizaFrameTabela();
 				}
 				catch(Exception e1) {
@@ -238,7 +234,7 @@ public class PrincipalView extends JFrame {
 				JFileChooser chooser = new JFileChooser();
 				chooser.setCurrentDirectory(new File("./"));
 				if(chooser.showOpenDialog(contentPane) == JFileChooser.APPROVE_OPTION) {
-					try(FileInputStream f = new FileInputStream(chooser.getSelectedFile()+".dat")) {
+					try(FileInputStream f = new FileInputStream(chooser.getSelectedFile())) {
 			    		ObjectInputStream o = new ObjectInputStream(f);
 			    	    Main.configuraDisco(o.readObject());
 			    	    o.close();
@@ -252,6 +248,7 @@ public class PrincipalView extends JFrame {
 		mnSimulador.add(mntmCarregarDeUm);
 		
 		table = new JTable(new DefaultTableModel(new Object[][] {},new String[] {"Arquivo","Tamanho","i-Node","Data criação","Última modificação"}));
+		table.setEnabled(false);
 		model = (DefaultTableModel) table.getModel();
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setBounds(10, 209, 411, 181);
@@ -259,7 +256,7 @@ public class PrincipalView extends JFrame {
 	}
 	
 	public String[] carregaTabela() {
-		String[] opcoes = new String[itensFrameTabela.size()];	
+		String[] opcoes = new String[Main.getTabela().size()];	
         int i = 0;
         for(File arquivo : Main.getTabela().keySet()){
         	opcoes[i] = arquivo.getName();
