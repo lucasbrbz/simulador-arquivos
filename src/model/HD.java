@@ -13,7 +13,7 @@ public class HD implements Serializable {
 		this.nBlocos = (tamanho/tBloco);
 	}
 	
-	public char[] getDisco() {
+	public char[] getVetorDisco() {
 		return disco;
 	}
 	
@@ -31,6 +31,10 @@ public class HD implements Serializable {
 	
 	public void setTamanhoBloco(int tBloco) {
 		this.tBloco = tBloco;
+	}
+	
+	public int getNumBlocos() {
+		return nBlocos;
 	}
 	
 }
