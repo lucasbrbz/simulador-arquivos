@@ -125,7 +125,7 @@ public class PrincipalView extends JFrame {
 						Node inode = new Node(texto.length(),permissao);
 						for(Bloco b : Main.getListaBlocos()) {
 							if(!b.estaOcupado()) {
-								for(int i=posicaoTexto,j=b.getPosicao();i<=texto.length();i++,j++) {
+								for(int i=posicaoTexto,j=b.getPosicao();i<texto.length();i++,j++) {
 									Main.getDisco().getVetorDisco()[j] = texto.charAt(i);
 									modelList.add(j,texto.charAt(i));
 									if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
@@ -136,17 +136,17 @@ public class PrincipalView extends JFrame {
 									}
 								}
 							}
-							Node.addNode();
-							Main.getTabela().put(arquivo, inode);
-							JOptionPane.showMessageDialog(null, "Arquivo criado com sucesso!", "Criar arquivo", JOptionPane.INFORMATION_MESSAGE);
-							adicionaFrameTabela(arquivo);
 						}
+						Node.addNode();
+						Main.getTabela().put(arquivo, inode);
+						JOptionPane.showMessageDialog(contentPane, "Arquivo criado com sucesso!", "Criar arquivo", JOptionPane.INFORMATION_MESSAGE);
+						adicionaFrameTabela(arquivo);
 					}
 					else if(editar == 1) {
 						Node inode = new Node(0,permissao);
 						Node.addNode();
 						Main.getTabela().put(arquivo, inode);
-						JOptionPane.showMessageDialog(null, "Arquivo criado com sucesso!", "Criar arquivo", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(contentPane, "Arquivo criado com sucesso!", "Criar arquivo", JOptionPane.INFORMATION_MESSAGE);
 						adicionaFrameTabela(arquivo);
 					}
 				} catch (Exception e) {
@@ -167,7 +167,7 @@ public class PrincipalView extends JFrame {
 					int posicaoTexto = 0;
 					for(Bloco b : Main.getListaBlocos()) {
 						if(!b.estaOcupado()) {
-							for(int i=posicaoTexto,j=b.getPosicao();i<=texto.length();i++,j++) {
+							for(int i=posicaoTexto,j=b.getPosicao();i<texto.length();i++,j++) {
 								Main.getDisco().getVetorDisco()[j] = texto.charAt(i);
 								if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
 									b.ocupar();
@@ -192,8 +192,7 @@ public class PrincipalView extends JFrame {
 					}
 					for(int i=0;i<table.getRowCount();i++) {
 						if(model.getValueAt(i,0).equals(arquivo)) {
-							model.insertRow(i+1,dados);
-							model.removeRow(i);	
+							model.setValueAt(dados, i, 0);
 							break;
 						}
 					}
@@ -243,9 +242,12 @@ public class PrincipalView extends JFrame {
 						Main.getDisco().setTamanhoBloco(tBloco);
 						JOptionPane.showMessageDialog(null, "Disco formatado com sucesso!", "Formatar disco", JOptionPane.INFORMATION_MESSAGE);
 						Main.atualizaTextField();
+						for(int i=0;i<Main.getDisco().getTamanho();i++) {
+							modelList.remove(i);
+							model.removeRow(i);
+						}
 					}
-					else
-						JOptionPane.showMessageDialog(null, "Impossível formatar disco!", "Erro", JOptionPane.ERROR_MESSAGE);
+					else JOptionPane.showMessageDialog(null, "Impossível formatar disco!", "Erro", JOptionPane.ERROR_MESSAGE);
 				} catch(Exception e1) {
 					
 				}
