@@ -5,11 +5,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import model.Bloco;
 import model.HD;
 import model.Node;
 import view.EditarView;
@@ -20,7 +22,7 @@ public class Main {
 	private static PrincipalView principalFrame = new PrincipalView();
 	private static EditarView editarFrame;
 	private static LinkedHashMap<String,Node> tabelaNodes = new LinkedHashMap<String,Node>();
-	private static int[] listaBlocos,listaBlocosLivres;
+	private static ArrayList<Bloco> listaBlocos = new ArrayList<Bloco>();
 	private static HD disco;
 
 	public static void main(String[] args) {
@@ -29,11 +31,7 @@ public class Main {
 			int tamanho = Integer.parseInt(JOptionPane.showInputDialog(null,"Tamanho do disco:","Criar disco rígido",JOptionPane.INFORMATION_MESSAGE));
 			int tBloco = Integer.parseInt(JOptionPane.showInputDialog(null,"Tamanho dos blocos:","Criar disco rígido",JOptionPane.INFORMATION_MESSAGE));
 			disco = new HD(tamanho,tBloco);
-			listaBlocos = new int[disco.getNumBlocos()];
-			listaBlocosLivres = new int[disco.getNumBlocos()];
-			for(int i=1;i<listaBlocos.length;i++) {
-				listaBlocos[i] = i*disco.getTamanhoBloco();
-			}
+			preencheListaBlocos();
 			JFileChooser chooser = new JFileChooser();
 			File file = new File("./disco.dat");
 			chooser.setCurrentDirectory(file);
@@ -44,7 +42,7 @@ public class Main {
 		    	    o.writeObject(Main.getDisco());
 		    	    o.flush();
 		    	    o.close();
-		    	    JOptionPane.showMessageDialog(null, "Salvo com sucesso!","Sucesso", JOptionPane.INFORMATION_MESSAGE);
+		    	    JOptionPane.showMessageDialog(null,"Salvo com sucesso!","Sucesso", JOptionPane.INFORMATION_MESSAGE);
 		    	} catch(Exception ex) {
 		            ex.printStackTrace();
 		        }
@@ -55,15 +53,13 @@ public class Main {
 	    		ObjectInputStream o = new ObjectInputStream(f);
 	    	    Main.configuraDisco(o.readObject());
 	    	    o.close();
-	    	    listaBlocosLivres = new int[disco.getNumBlocos()];
-				for(int i=1;i<listaBlocosLivres.length;i++) {
-					listaBlocosLivres[i] = i*disco.getTamanhoBloco();
-				}
+	    	    preencheListaBlocos();
 	    	    JOptionPane.showMessageDialog(null, "Disco carregado com sucesso!","Sucesso", JOptionPane.INFORMATION_MESSAGE);
 	    	} catch(Exception ex) {
 	            ex.printStackTrace();
 	        }
 		}
+		montaJList();
 		atualizaTextField();
 	}
 	
@@ -89,12 +85,8 @@ public class Main {
 		return tabelaNodes;
 	}
 	
-	public static int[] getListaBlocos() {
+	public static ArrayList<Bloco> getListaBlocos() {
 		return listaBlocos;
-	}
-	
-	public static int[] getListaBlocosLivres() {
-		return listaBlocosLivres;
 	}
 	
 	public static void configuraDisco(Object discoArquivo) {
@@ -104,5 +96,21 @@ public class Main {
 	public static void atualizaTextField() {
 		principalFrame.getTextFieldTamanho().setText(Integer.toString(disco.getTamanho()));
 		principalFrame.getTextFieldTamanhoBloco().setText(Integer.toString(disco.getTamanhoBloco()));
+	}
+	
+	private static void preencheListaBlocos() {
+		listaBlocos = new ArrayList<Bloco>();
+		for(int i=0;i<disco.getNumBlocos();i++) {
+			Bloco b = new Bloco(i*Main.getDisco().getTamanhoBloco());
+			listaBlocos.add(b);
+		}
+	}
+	
+	public static void montaJList() {
+		principalFrame.getListModel().setSize(disco.getTamanho());
+	}
+	
+	public static void atualizaJList() {
+		
 	}
 }

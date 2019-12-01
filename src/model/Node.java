@@ -7,8 +7,7 @@ public class Node {
 	private static int nINodes = 0;
 	private int tamanho,id;
 	private int[] referencias = new int[12];
-	private String permissao,datacriacao,ultimamodificacao;
-	private File arquivo;
+	private String permissao,datacriacao,ultimamodificacao,arquivo;
 	
 	public Node(int tamanho,String permissao) {
 		Calendar c = Calendar.getInstance();
@@ -23,7 +22,7 @@ public class Node {
 		
 	}
 	
-	public void setArquivo(File arquivo) {
+	public void setArquivo(String arquivo) {
 		this.arquivo = arquivo;
 	}
 	
@@ -47,5 +46,13 @@ public class Node {
 		return ultimamodificacao;
 	}
 	
+	public void setTamanho(int tamanho) {
+		this.tamanho = tamanho;
+	}
+	
+	public void setDataModificacao() {
+		Calendar c = Calendar.getInstance();
+		this.ultimamodificacao = c.get(Calendar.DATE) + "/" + (c.get(Calendar.MONTH)+1) + "/" + c.get(Calendar.YEAR);;
+	}
 	
 }
