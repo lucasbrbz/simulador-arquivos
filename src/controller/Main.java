@@ -102,7 +102,10 @@ public class Main {
 	}
 	
 	public static void montaJList() {
-		principalFrame.getListModel().setSize(disco.getTamanho());
+		principalFrame.getJList().setSize(disco.getTamanho(),1);
+		for(int i=0;i<disco.getTamanho();i++) {
+			principalFrame.getListModel().add(i,' ');
+		}
 	}
 	
 	public static void atualizaJList() {

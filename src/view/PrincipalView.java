@@ -23,7 +23,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.JTable;
 import javax.swing.JLabel;
@@ -33,6 +32,7 @@ import java.awt.Font;
 
 import javax.swing.JTextField;
 import java.awt.Color;
+import java.awt.ComponentOrientation;
 
 public class PrincipalView extends JFrame {
 
@@ -41,7 +41,6 @@ public class PrincipalView extends JFrame {
 	private DefaultListModel<Character> modelList = new DefaultListModel<Character>();
 	private JTable table,tableBlocos;
 	private DefaultTableModel model,modelTableBlocos;
-	private ArrayList<String> itensFrameTabela = new ArrayList<>();
 	private JTextField textFieldTamanhoDisco,textFieldTamanhoBloco;
 
 	public PrincipalView() {
@@ -121,23 +120,19 @@ public class PrincipalView extends JFrame {
 					if(permissao.equals(null)) throw new Exception();
 					int editar = JOptionPane.showConfirmDialog(null,"Deseja editar o arquivo?","Criar arquivo",JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
 					if(editar == 0) {
-						Main.callEditarFrame(arquivo);
-						if(Main.getEditarFrame().getFlagSalvar()) {
-							String texto = Main.getEditarFrame().getTextPane().getText();
-							int tamanhoTexto = Main.getEditarFrame().getTextPane().getText().length(); //se não tiver nada length = 0
-							int posicaoTexto = 0;
-							Node inode = new Node(tamanhoTexto,permissao);
-							for(Bloco b : Main.getListaBlocos()) {
-								if(!b.estaOcupado()) {
-									for(int i=posicaoTexto,j=b.getPosicao();i<=tamanhoTexto;i++,j++) {
-										Main.getDisco().getVetorDisco()[j] = texto.charAt(i);
-										modelList.add(j,texto.charAt(i));
-										if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
-											b.ocupar();
-											inode.addReferencia(b.getPosicao());
-											posicaoTexto = i+1;
-											break;
-										}
+						String texto = JOptionPane.showInputDialog(contentPane,null,"Editar arquivo - " + arquivo,JOptionPane.INFORMATION_MESSAGE);
+						int posicaoTexto = 0;
+						Node inode = new Node(texto.length(),permissao);
+						for(Bloco b : Main.getListaBlocos()) {
+							if(!b.estaOcupado()) {
+								for(int i=posicaoTexto,j=b.getPosicao();i<=texto.length();i++,j++) {
+									Main.getDisco().getVetorDisco()[j] = texto.charAt(i);
+									modelList.add(j,texto.charAt(i));
+									if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
+										b.ocupar();
+										inode.addReferencia(b.getPosicao());
+										posicaoTexto = i+1;
+										break;
 									}
 								}
 							}
@@ -168,34 +163,31 @@ public class PrincipalView extends JFrame {
 					Object[] dados = null;
 					String[] opcoes = carregaTabela();
 					String arquivo = (String) JOptionPane.showInputDialog(contentPane,null,"Escolha o arquivo",JOptionPane.INFORMATION_MESSAGE,null, opcoes,opcoes[0]);
-					Main.callEditarFrame(arquivo);
-					if(Main.getEditarFrame().getFlagSalvar()) {
-						String texto = Main.getEditarFrame().getTextPane().getText();
-						int tamanhoTexto = Main.getEditarFrame().getTextPane().getText().length(); //se não tiver nada length = 0
-						int posicaoTexto = 0;
-						for(Bloco b : Main.getListaBlocos()) {
-							if(!b.estaOcupado()) {
-								for(int i=posicaoTexto,j=b.getPosicao();i<=tamanhoTexto;i++,j++) {
-									Main.getDisco().getVetorDisco()[j] = texto.charAt(i);
-									if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
-										b.ocupar();
-										posicaoTexto = i+1;
-										break;
-									}
+					String texto = JOptionPane.showInputDialog(contentPane,null,"Editar arquivo - " + arquivo,JOptionPane.INFORMATION_MESSAGE);
+					int posicaoTexto = 0;
+					for(Bloco b : Main.getListaBlocos()) {
+						if(!b.estaOcupado()) {
+							for(int i=posicaoTexto,j=b.getPosicao();i<=texto.length();i++,j++) {
+								Main.getDisco().getVetorDisco()[j] = texto.charAt(i);
+								if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
+									b.ocupar();
+									posicaoTexto = i+1;
+									break;
 								}
 							}
 						}
-						for(String s : Main.getTabela().keySet()) {
-							if(s.equals(arquivo)) {
-								Main.getTabela().get(s).setTamanho(tamanhoTexto);
-								dados = new Object[]{
-										arquivo,
-										Main.getTabela().get(arquivo).getTamanho(),
-										Main.getTabela().get(arquivo).getID(),
-										Main.getTabela().get(arquivo).getDataCriacao(),
-										Main.getTabela().get(arquivo).getDataModificacao()
-									};
-							}
+					}
+					for(String s : Main.getTabela().keySet()) {
+						if(s.equals(arquivo)) {
+							Main.getTabela().get(s).setTamanho(texto.length());
+							dados = new Object[]{
+									s,
+									Main.getTabela().get(s).getTamanho(),
+									Main.getTabela().get(s).getID(),
+									Main.getTabela().get(s).getDataCriacao(),
+									Main.getTabela().get(s).getDataModificacao()
+								};
+							break;
 						}
 					}
 					for(int i=0;i<table.getRowCount();i++) {
@@ -305,6 +297,7 @@ public class PrincipalView extends JFrame {
 		mnSimulador.add(mntmCarregarDeUm);
 		
 		table = new JTable(new DefaultTableModel(new Object[][] {},new String[] {"Arquivo","Tamanho","i-Node","Data criação","Última modificação"}));
+		table.setAutoscrolls(false);
 		table.setEnabled(false);
 		model = (DefaultTableModel) table.getModel();
 		JScrollPane scrollPane = new JScrollPane(table);
@@ -312,6 +305,8 @@ public class PrincipalView extends JFrame {
 		contentPane.add(scrollPane);
 		
 		tableBlocos = new JTable(new DefaultTableModel(new Object[][] {},new String[] {"Elemento","Endereço","Qtd de blocos livres"}));
+		tableBlocos.setRowSelectionAllowed(false);
+		tableBlocos.setAutoscrolls(false);
 		tableBlocos.setEnabled(false);
 		modelTableBlocos = (DefaultTableModel) tableBlocos.getModel();
 		JScrollPane scrollPaneBlocos = new JScrollPane(tableBlocos);
@@ -319,9 +314,11 @@ public class PrincipalView extends JFrame {
 		contentPane.add(scrollPaneBlocos);
 		
 		list = new JList<Character>();
+		list.setVisibleRowCount(-1);
+		list.setAutoscrolls(false);
 		list.setEnabled(false);
 		list.setModel(modelList);
-		list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+		list.setLayoutOrientation(JList.VERTICAL_WRAP);
 		JScrollPane scrollPaneList = new JScrollPane(list);
 		scrollPaneList.setBounds(10, 126, 411, 28);
 		contentPane.add(scrollPaneList);
@@ -345,7 +342,6 @@ public class PrincipalView extends JFrame {
 			Main.getTabela().get(arquivo).getDataCriacao(),
 			Main.getTabela().get(arquivo).getDataModificacao()
 			});
-			itensFrameTabela.add(arquivo);
 	}
 	
 	public JTextField getTextFieldTamanho() {
