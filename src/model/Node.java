@@ -1,12 +1,11 @@
 package model;
 
-import java.io.File;
 import java.util.Calendar;
 
 public class Node {
 	private static int nINodes = 0;
-	private int tamanho,id;
-	private int[] referencias = new int[12];
+	private int tamanho,id,ultimaPosicao = 0;
+	private int[] referencias = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 	private String permissao,datacriacao,ultimamodificacao,arquivo;
 	
 	public Node(int tamanho,String permissao) {
@@ -18,8 +17,13 @@ public class Node {
 		this.id = nINodes;
 	}
 	
-	public void setReferencias(int[] referencias) {
-		
+	public int[] getReferencias() {
+		return referencias;
+	}
+	
+	public void addReferencia(int posicao) {
+		referencias[ultimaPosicao] = posicao;
+		ultimaPosicao++;
 	}
 	
 	public void setArquivo(String arquivo) {

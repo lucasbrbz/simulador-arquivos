@@ -34,7 +34,7 @@ public class Main {
 			preencheListaBlocos();
 			JFileChooser chooser = new JFileChooser();
 			File file = new File("./disco.dat");
-			chooser.setCurrentDirectory(file);
+			chooser.setCurrentDirectory(new File("./"));
 		    if(chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
 		    	chooser.setSelectedFile(file);
 		    	try(FileOutputStream f = new FileOutputStream(chooser.getSelectedFile())) {
@@ -42,7 +42,7 @@ public class Main {
 		    	    o.writeObject(Main.getDisco());
 		    	    o.flush();
 		    	    o.close();
-		    	    JOptionPane.showMessageDialog(null,"Salvo com sucesso!","Sucesso", JOptionPane.INFORMATION_MESSAGE);
+		    	    JOptionPane.showMessageDialog(null,"Disco criado com sucesso!","Sucesso", JOptionPane.INFORMATION_MESSAGE);
 		    	} catch(Exception ex) {
 		            ex.printStackTrace();
 		        }
@@ -61,11 +61,6 @@ public class Main {
 		}
 		montaJList();
 		atualizaTextField();
-	}
-	
-	public static void callEditarFrame() {
-		editarFrame = new EditarView();
-		editarFrame.setVisible(true);
 	}
 	
 	public static void callEditarFrame(String nomearq) {

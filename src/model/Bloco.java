@@ -1,7 +1,5 @@
 package model;
 
-import controller.Main;
-
 public class Bloco {
 	private int posicao;
 	private boolean ocupado;

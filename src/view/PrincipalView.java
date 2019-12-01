@@ -30,6 +30,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 
 import java.awt.Font;
+
 import javax.swing.JTextField;
 import java.awt.Color;
 
@@ -105,14 +106,27 @@ public class PrincipalView extends JFrame {
 					for(String file : Main.getTabela().keySet()) if(file.equals(arquivo)) throw new Exception();
 					if(arquivo.equals("") || arquivo.equals(null)) throw new Exception();
 					String[] opcoes = {"Leitura","Escrita","Leitura/Escrita"};
-					String permissao = (String) JOptionPane.showInputDialog(contentPane,"Escolha o tipo de permissão:","Criar arquivo",JOptionPane.INFORMATION_MESSAGE,null, opcoes,opcoes[0]);
+					String permissao = null;
+					switch((String) JOptionPane.showInputDialog(contentPane,"Escolha o tipo de permissão:","Criar arquivo",JOptionPane.INFORMATION_MESSAGE,null, opcoes,opcoes[0])) {
+						case "Leitura":
+							permissao = "r";
+							break;
+						case "Escrita":
+							permissao = "w";
+							break;
+						case "Leitura/Escrita":
+							permissao = "rw";
+							break;
+					}
 					if(permissao.equals(null)) throw new Exception();
-					if(JOptionPane.showConfirmDialog(null,"Deseja editar o arquivo?","Criar arquivo",JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE) == 0) {
+					int editar = JOptionPane.showConfirmDialog(null,"Deseja editar o arquivo?","Criar arquivo",JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+					if(editar == 0) {
 						Main.callEditarFrame(arquivo);
 						if(Main.getEditarFrame().getFlagSalvar()) {
 							String texto = Main.getEditarFrame().getTextPane().getText();
 							int tamanhoTexto = Main.getEditarFrame().getTextPane().getText().length(); //se não tiver nada length = 0
 							int posicaoTexto = 0;
+							Node inode = new Node(tamanhoTexto,permissao);
 							for(Bloco b : Main.getListaBlocos()) {
 								if(!b.estaOcupado()) {
 									for(int i=posicaoTexto,j=b.getPosicao();i<=tamanhoTexto;i++,j++) {
@@ -120,29 +134,25 @@ public class PrincipalView extends JFrame {
 										modelList.add(j,texto.charAt(i));
 										if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
 											b.ocupar();
+											inode.addReferencia(b.getPosicao());
 											posicaoTexto = i+1;
 											break;
 										}
 									}
 								}
 							}
-							Node inode = new Node(tamanhoTexto,permissao);
 							Node.addNode();
 							Main.getTabela().put(arquivo, inode);
 							JOptionPane.showMessageDialog(null, "Arquivo criado com sucesso!", "Criar arquivo", JOptionPane.INFORMATION_MESSAGE);
-							adicionaFrameTabela();
+							adicionaFrameTabela(arquivo);
 						}
 					}
-					else if(JOptionPane.showConfirmDialog(null,"Deseja editar o arquivo?","Criar arquivo",JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE) == 1) {
+					else if(editar == 1) {
 						Node inode = new Node(0,permissao);
 						Node.addNode();
 						Main.getTabela().put(arquivo, inode);
 						JOptionPane.showMessageDialog(null, "Arquivo criado com sucesso!", "Criar arquivo", JOptionPane.INFORMATION_MESSAGE);
-						adicionaFrameTabela();
-					}
-					else{
-						atualizaFrameTabela();
-						throw new Exception();
+						adicionaFrameTabela(arquivo);
 					}
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(null, "Impossível criar o arquivo/arquivo já existente!", "Erro", JOptionPane.ERROR_MESSAGE);
@@ -154,32 +164,51 @@ public class PrincipalView extends JFrame {
 		JMenuItem mntmEditarArquivo = new JMenuItem("Editar arquivo");
 		mntmEditarArquivo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String[] opcoes = carregaTabela();
-				String arquivo = (String) JOptionPane.showInputDialog(contentPane,null,"Escolha o arquivo",JOptionPane.INFORMATION_MESSAGE,null, opcoes,opcoes[0]);
-				Main.callEditarFrame(arquivo);
-				if(Main.getEditarFrame().getFlagSalvar()) {
-					String texto = Main.getEditarFrame().getTextPane().getText();
-					int tamanhoTexto = Main.getEditarFrame().getTextPane().getText().length(); //se não tiver nada length = 0
-					int posicaoTexto = 0;
-					for(Bloco b : Main.getListaBlocos()) {
-						if(!b.estaOcupado()) {
-							for(int i=posicaoTexto,j=b.getPosicao();i<=tamanhoTexto;i++,j++) {
-								Main.getDisco().getVetorDisco()[j] = texto.charAt(i);
-								if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
-									b.ocupar();
-									posicaoTexto = i+1;
-									break;
+				try {
+					Object[] dados = null;
+					String[] opcoes = carregaTabela();
+					String arquivo = (String) JOptionPane.showInputDialog(contentPane,null,"Escolha o arquivo",JOptionPane.INFORMATION_MESSAGE,null, opcoes,opcoes[0]);
+					Main.callEditarFrame(arquivo);
+					if(Main.getEditarFrame().getFlagSalvar()) {
+						String texto = Main.getEditarFrame().getTextPane().getText();
+						int tamanhoTexto = Main.getEditarFrame().getTextPane().getText().length(); //se não tiver nada length = 0
+						int posicaoTexto = 0;
+						for(Bloco b : Main.getListaBlocos()) {
+							if(!b.estaOcupado()) {
+								for(int i=posicaoTexto,j=b.getPosicao();i<=tamanhoTexto;i++,j++) {
+									Main.getDisco().getVetorDisco()[j] = texto.charAt(i);
+									if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
+										b.ocupar();
+										posicaoTexto = i+1;
+										break;
+									}
 								}
 							}
 						}
-					}
-					for(String s : Main.getTabela().keySet()) {
-						if(s.equals(arquivo)) {
-							Main.getTabela().get(s).setTamanho(tamanhoTexto);
+						for(String s : Main.getTabela().keySet()) {
+							if(s.equals(arquivo)) {
+								Main.getTabela().get(s).setTamanho(tamanhoTexto);
+								dados = new Object[]{
+										arquivo,
+										Main.getTabela().get(arquivo).getTamanho(),
+										Main.getTabela().get(arquivo).getID(),
+										Main.getTabela().get(arquivo).getDataCriacao(),
+										Main.getTabela().get(arquivo).getDataModificacao()
+									};
+							}
 						}
 					}
+					for(int i=0;i<table.getRowCount();i++) {
+						if(model.getValueAt(i,0).equals(arquivo)) {
+							model.insertRow(i+1,dados);
+							model.removeRow(i);	
+							break;
+						}
+					}
+					table.revalidate();
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(null, "Não há arquivos no sistema!", "Erro", JOptionPane.ERROR_MESSAGE);
 				}
-				atualizaFrameTabela();
 			}
 		});
 		mnArquivo.add(mntmEditarArquivo);
@@ -193,7 +222,13 @@ public class PrincipalView extends JFrame {
 					if(arquivo.equals(null)) throw new Exception();
 					Main.getTabela().remove(arquivo);
 					JOptionPane.showMessageDialog(null, "Arquivo removido com sucesso!", "Remover arquivo", JOptionPane.INFORMATION_MESSAGE);
-					atualizaFrameTabela();
+					for(int i=0;i<table.getRowCount();i++) {
+						if(model.getValueAt(i,0).equals(arquivo)) {
+							model.removeRow(i);	
+							break;
+						}
+					}
+					table.revalidate();
 				}
 				catch(Exception e1) {
 					JOptionPane.showMessageDialog(null, "Não há arquivos no sistema!", "Erro", JOptionPane.ERROR_MESSAGE);
@@ -302,39 +337,15 @@ public class PrincipalView extends JFrame {
 		return opcoes;
 	}
 	
-	public void adicionaFrameTabela() {
-		boolean b = true;
-		for(String arquivo : Main.getTabela().keySet()){	
-			for(String item : itensFrameTabela){
-				if(item.equals(arquivo)) {
-					b = false;
-				}
-			}		
-			if(b) {
-				model.addRow(new Object[]{
-						arquivo,
-						Integer.toString(Main.getTabela().get(arquivo).getTamanho()),
-						Integer.toString(Main.getTabela().get(arquivo).getID()),
-						Main.getTabela().get(arquivo).getDataCriacao(),
-						Main.getTabela().get(arquivo).getDataModificacao()});
-				itensFrameTabela.add(arquivo);
-			}
-		}
-	}
-	
-	public void atualizaFrameTabela() {
-		for(int i=0;i<itensFrameTabela.size();i++) {
-			model.removeRow(i);
-		}
-		for(String item : itensFrameTabela) {
-			model.addRow(new Object[]{
-					item,
-					Integer.toString(Main.getTabela().get(item).getTamanho()),
-					Integer.toString(Main.getTabela().get(item).getID()),
-					Main.getTabela().get(item).getDataCriacao(),
-					Main.getTabela().get(item).getDataModificacao()});
-		}
-		table.revalidate();
+	public void adicionaFrameTabela(String arquivo) {
+		model.addRow(new Object[]{
+			arquivo,
+			Main.getTabela().get(arquivo).getTamanho(),
+			Main.getTabela().get(arquivo).getID(),
+			Main.getTabela().get(arquivo).getDataCriacao(),
+			Main.getTabela().get(arquivo).getDataModificacao()
+			});
+			itensFrameTabela.add(arquivo);
 	}
 	
 	public JTextField getTextFieldTamanho() {
@@ -353,5 +364,3 @@ public class PrincipalView extends JFrame {
 		return modelList;
 	}
 }
-
-
