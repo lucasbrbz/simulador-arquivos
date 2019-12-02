@@ -59,7 +59,7 @@ public class Main {
 	    		JOptionPane.showMessageDialog(null, "Impossível carregar o disco!", "Erro", JOptionPane.ERROR_MESSAGE);
 	        }
 		}
-		montaJList();
+		montaJList(false);
 		atualizaTextField();
 	}
 	
@@ -93,8 +93,9 @@ public class Main {
 		}
 	}
 	
-	public static void montaJList() {
+	public static void montaJList(boolean flag) {
 		principalFrame.getJList().setSize(disco.getTamanho(),1);
+		if(flag) principalFrame.getListModel().removeAllElements();;
 		for(int i=0;i<disco.getTamanho();i++) {
 			principalFrame.getListModel().add(i,'-');
 		}

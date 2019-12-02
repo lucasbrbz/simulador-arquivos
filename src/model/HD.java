@@ -16,6 +16,10 @@ public class HD implements Serializable {
 		this.nBlocos = (tamanho/tBloco);
 	}
 	
+	public void novoVetorDisco(int tamanho) {
+		this.disco = new char[tamanho];
+	}
+	
 	public char[] getVetorDisco() {
 		return disco;
 	}

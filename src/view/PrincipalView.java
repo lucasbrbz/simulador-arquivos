@@ -305,18 +305,20 @@ public class PrincipalView extends JFrame {
 					int tDisco = Integer.parseInt(JOptionPane.showInputDialog(contentPane,"Tamanho do disco:","Formatar disco",JOptionPane.INFORMATION_MESSAGE));
 					int tBloco = Integer.parseInt(JOptionPane.showInputDialog(contentPane,"Tamanho do bloco:","Formatar disco",JOptionPane.INFORMATION_MESSAGE));
 					if(tDisco%tBloco == 0) {
-						for(String key : Main.getTabela().keySet()) Main.getTabela().remove(key);
-						for(int i=0;i<Main.getDisco().getTamanho();i++) {
-							System.out.println(1);
-							modelList.setElementAt('-',i);
-							model.removeRow(i);
-							Main.getDisco().getVetorDisco()[i] = ' ';
+						if(!Main.getTabela().isEmpty()) {
+							for(int i=0;i<Main.getTabela().size();i++) {
+								model.removeRow(0);
+							}
+							Main.getTabela().clear();
 						}
+						Main.getDisco().novoVetorDisco(tDisco);
 						Main.getDisco().setTamanho(tDisco);
 						Main.getDisco().setTamanhoBloco(tBloco);
-						JOptionPane.showMessageDialog(null, "Disco formatado com sucesso!", "Formatar disco", JOptionPane.INFORMATION_MESSAGE);
+						Main.montaJList(true);
+						Node.zeraNodeID();
 						Main.atualizaTextField();
 						Main.preencheListaBlocos();
+						JOptionPane.showMessageDialog(null, "Disco formatado com sucesso!", "Formatar disco", JOptionPane.INFORMATION_MESSAGE);
 						table.revalidate();
 					}
 					else JOptionPane.showMessageDialog(null, "Impossível formatar disco!", "Erro", JOptionPane.ERROR_MESSAGE);

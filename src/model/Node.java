@@ -46,6 +46,10 @@ public class Node {
 		nINodes++;
 	}
 	
+	public static void zeraNodeID() {
+		nINodes = 0;
+	}
+	
 	public String getDataCriacao() {
 		return datacriacao;
 	}
