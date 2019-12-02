@@ -7,13 +7,17 @@ public class HD implements Serializable {
 	
 	private char[] disco;
 	private int tamanho,tBloco,nBlocos;
-	private LinkedHashMap<String,Node> tabelaNodes;
+	private static LinkedHashMap<String,Node> tabelaNodes = new LinkedHashMap<String,Node>();
 
 	public HD(int tamanho,int tBloco) {
 		this.disco = new char[tamanho];
 		this.tamanho = tamanho;
 		this.tBloco = tBloco;
 		this.nBlocos = (tamanho/tBloco);
+	}
+	
+	public static LinkedHashMap<String,Node> getTabela() {
+		return tabelaNodes;
 	}
 	
 	public void novoVetorDisco(int tamanho) {

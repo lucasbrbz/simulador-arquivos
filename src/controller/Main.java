@@ -20,7 +20,6 @@ import view.PrincipalView;
 public class Main {
 	
 	private static PrincipalView principalFrame = new PrincipalView();
-	private static LinkedHashMap<String,Node> tabelaNodes = new LinkedHashMap<String,Node>();
 	private static ArrayList<Bloco> listaBlocos = new ArrayList<Bloco>();
 	private static HD disco;
 
@@ -38,10 +37,12 @@ public class Main {
 			    if(chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
 			    	FileOutputStream f = new FileOutputStream(chooser.getSelectedFile());
 			    	ObjectOutputStream o = new ObjectOutputStream(f);
-			    	Main.getDisco().setTabelaNodes(tabelaNodes);
+			    	Main.getDisco().setTabelaNodes(disco.getTabelaNodes());
 			    	o.writeObject(Main.getDisco());
 			    	o.flush();
 			    	o.close();
+			    	montaJList(false);
+					atualizaTextField();
 			    	JOptionPane.showMessageDialog(null,"Disco criado com sucesso!","Sucesso", JOptionPane.INFORMATION_MESSAGE);
 			    } else throw new Exception();
 			} catch(Exception ex) {
@@ -54,21 +55,22 @@ public class Main {
 	    	    Main.configuraDisco(o.readObject());
 	    	    o.close();
 	    	    preencheListaBlocos();
+	    	    principalFrame.getJList().setSize(disco.getTamanho(),1);
+				disco.getTabelaNodes().forEach((k,v) -> {
+					principalFrame.adicionaFrameTabela(k);
+					// adicionar no jlist
+				});
+				atualizaTextField();
 	    	    JOptionPane.showMessageDialog(null, "Disco carregado com sucesso!","Sucesso", JOptionPane.INFORMATION_MESSAGE);
 	    	} catch(Exception ex) {
 	    		JOptionPane.showMessageDialog(null, "Impossível carregar o disco!", "Erro", JOptionPane.ERROR_MESSAGE);
 	        }
 		}
-		montaJList(false);
-		atualizaTextField();
+		
 	}
 	
 	public static HD getDisco() {
 		return disco;
-	}
-	
-	public static LinkedHashMap<String,Node> getTabela() {
-		return tabelaNodes;
 	}
 	
 	public static ArrayList<Bloco> getListaBlocos() {
@@ -77,7 +79,6 @@ public class Main {
 	
 	public static void configuraDisco(Object discoArquivo) {
 		 disco = (HD) discoArquivo;
-		 tabelaNodes = disco.getTabelaNodes();
 	}
 	
 	public static void atualizaTextField() {
