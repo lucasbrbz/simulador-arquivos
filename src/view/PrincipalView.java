@@ -32,7 +32,6 @@ import java.awt.Font;
 
 import javax.swing.JTextField;
 import java.awt.Color;
-import java.awt.ComponentOrientation;
 
 public class PrincipalView extends JFrame {
 
@@ -59,8 +58,8 @@ public class PrincipalView extends JFrame {
 		contentPane.add(menuBar);
 		
 		JPanel panel = new JPanel();
+		panel.setBounds(10, 26, 411, 81);
 		panel.setBackground(Color.GRAY);
-		panel.setBounds(10, 26, 411, 89);
 		contentPane.add(panel);
 		panel.setLayout(null);
 		
@@ -70,7 +69,9 @@ public class PrincipalView extends JFrame {
 		panel.add(lblDiscoRigidohd);
 		
 		textFieldTamanhoDisco = new JTextField();
+		textFieldTamanhoDisco.setDisabledTextColor(new Color(0, 0, 0));
 		textFieldTamanhoDisco.setEnabled(false);
+		textFieldTamanhoDisco.setHorizontalAlignment(JTextField.CENTER);
 		textFieldTamanhoDisco.setBounds(20, 51, 86, 20);
 		panel.add(textFieldTamanhoDisco);
 		textFieldTamanhoDisco.setColumns(10);
@@ -80,7 +81,9 @@ public class PrincipalView extends JFrame {
 		panel.add(lblTamanhoDoDisco);
 		
 		textFieldTamanhoBloco = new JTextField();
+		textFieldTamanhoBloco.setDisabledTextColor(Color.BLACK);
 		textFieldTamanhoBloco.setEnabled(false);
+		textFieldTamanhoBloco.setHorizontalAlignment(JTextField.CENTER);
 		textFieldTamanhoBloco.setBounds(137, 51, 86, 20);
 		panel.add(textFieldTamanhoBloco);
 		textFieldTamanhoBloco.setColumns(10);
@@ -122,19 +125,22 @@ public class PrincipalView extends JFrame {
 					if(editar == 0) {
 						String texto = JOptionPane.showInputDialog(contentPane,null,"Editar arquivo - " + arquivo,JOptionPane.INFORMATION_MESSAGE);
 						int posicaoTexto = 0;
+						boolean terminou = false;
 						Node inode = new Node(texto.length(),permissao);
 						for(Bloco b : Main.getListaBlocos()) {
-							if(!b.estaOcupado()) {
+							if(b.estaOcupado() == false) {
+								b.ocupar();
+								inode.addReferencia(b.getPosicao());
 								for(int i=posicaoTexto,j=b.getPosicao();i<texto.length();i++,j++) {
 									Main.getDisco().getVetorDisco()[j] = texto.charAt(i);
-									modelList.add(j,texto.charAt(i));
+									modelList.setElementAt(texto.charAt(i),j);
+									if(i == texto.length() - 1) terminou = true;
 									if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
-										b.ocupar();
-										inode.addReferencia(b.getPosicao());
 										posicaoTexto = i+1;
 										break;
 									}
 								}
+								if(terminou) break;
 							}
 						}
 						Node.addNode();
@@ -165,34 +171,30 @@ public class PrincipalView extends JFrame {
 					String arquivo = (String) JOptionPane.showInputDialog(contentPane,null,"Escolha o arquivo",JOptionPane.INFORMATION_MESSAGE,null, opcoes,opcoes[0]);
 					String texto = JOptionPane.showInputDialog(contentPane,null,"Editar arquivo - " + arquivo,JOptionPane.INFORMATION_MESSAGE);
 					int posicaoTexto = 0;
+					boolean terminou = false;
 					for(Bloco b : Main.getListaBlocos()) {
-						if(!b.estaOcupado()) {
+						if(b.estaOcupado() == false) {
+							b.ocupar();
 							for(int i=posicaoTexto,j=b.getPosicao();i<texto.length();i++,j++) {
 								Main.getDisco().getVetorDisco()[j] = texto.charAt(i);
+								modelList.setElementAt(texto.charAt(i),j);
+								if(i == texto.length() - 1) terminou = true;
 								if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
-									b.ocupar();
 									posicaoTexto = i+1;
 									break;
 								}
 							}
+							if(terminou) break;
 						}
 					}
-					for(String s : Main.getTabela().keySet()) {
-						if(s.equals(arquivo)) {
-							Main.getTabela().get(s).setTamanho(texto.length());
-							dados = new Object[]{
-									s,
-									Main.getTabela().get(s).getTamanho(),
-									Main.getTabela().get(s).getID(),
-									Main.getTabela().get(s).getDataCriacao(),
-									Main.getTabela().get(s).getDataModificacao()
-								};
-							break;
-						}
-					}
+					Main.getTabela().get(arquivo).setTamanho(texto.length());
 					for(int i=0;i<table.getRowCount();i++) {
 						if(model.getValueAt(i,0).equals(arquivo)) {
-							model.setValueAt(dados, i, 0);
+							model.setValueAt(arquivo, i, 0);
+							model.setValueAt(Main.getTabela().get(arquivo).getTamanho(), i, 1);
+							model.setValueAt(Main.getTabela().get(arquivo).getID(), i, 2);
+							model.setValueAt(Main.getTabela().get(arquivo).getDataCriacao(), i, 3);
+							model.setValueAt(Main.getTabela().get(arquivo).getDataModificacao(), i, 4);
 							break;
 						}
 					}
@@ -238,14 +240,19 @@ public class PrincipalView extends JFrame {
 					int tDisco = Integer.parseInt(JOptionPane.showInputDialog(contentPane,"Tamanho do disco:","Formatar disco",JOptionPane.INFORMATION_MESSAGE));
 					int tBloco = Integer.parseInt(JOptionPane.showInputDialog(contentPane,"Tamanho do bloco:","Formatar disco",JOptionPane.INFORMATION_MESSAGE));
 					if(tDisco%tBloco == 0) {
+						for(String key : Main.getTabela().keySet()) Main.getTabela().remove(key);
+						for(int i=0;i<Main.getDisco().getTamanho();i++) {
+							System.out.println(1);
+							modelList.setElementAt('-',i);;
+							model.removeRow(i);
+							Main.getDisco().getVetorDisco()[i] = ' ';
+						}
 						Main.getDisco().setTamanho(tDisco);
 						Main.getDisco().setTamanhoBloco(tBloco);
 						JOptionPane.showMessageDialog(null, "Disco formatado com sucesso!", "Formatar disco", JOptionPane.INFORMATION_MESSAGE);
 						Main.atualizaTextField();
-						for(int i=0;i<Main.getDisco().getTamanho();i++) {
-							modelList.remove(i);
-							model.removeRow(i);
-						}
+						Main.preencheListaBlocos();
+						table.revalidate();
 					}
 					else JOptionPane.showMessageDialog(null, "Impossível formatar disco!", "Erro", JOptionPane.ERROR_MESSAGE);
 				} catch(Exception e1) {
@@ -299,6 +306,8 @@ public class PrincipalView extends JFrame {
 		mnSimulador.add(mntmCarregarDeUm);
 		
 		table = new JTable(new DefaultTableModel(new Object[][] {},new String[] {"Arquivo","Tamanho","i-Node","Data criação","Última modificação"}));
+		table.getTableHeader().setResizingAllowed(false);
+		table.getTableHeader().setReorderingAllowed(false);
 		table.setAutoscrolls(false);
 		table.setEnabled(false);
 		model = (DefaultTableModel) table.getModel();
@@ -307,6 +316,8 @@ public class PrincipalView extends JFrame {
 		contentPane.add(scrollPane);
 		
 		tableBlocos = new JTable(new DefaultTableModel(new Object[][] {},new String[] {"Elemento","Endereço","Qtd de blocos livres"}));
+		tableBlocos.getTableHeader().setResizingAllowed(false);
+		tableBlocos.getTableHeader().setReorderingAllowed(false);
 		tableBlocos.setRowSelectionAllowed(false);
 		tableBlocos.setAutoscrolls(false);
 		tableBlocos.setEnabled(false);
@@ -316,13 +327,15 @@ public class PrincipalView extends JFrame {
 		contentPane.add(scrollPaneBlocos);
 		
 		list = new JList<Character>();
+		list.setForeground(Color.BLACK);
 		list.setVisibleRowCount(-1);
 		list.setAutoscrolls(false);
 		list.setEnabled(false);
 		list.setModel(modelList);
 		list.setLayoutOrientation(JList.VERTICAL_WRAP);
 		JScrollPane scrollPaneList = new JScrollPane(list);
-		scrollPaneList.setBounds(10, 126, 411, 28);
+		scrollPaneList.setForeground(Color.BLACK);
+		scrollPaneList.setBounds(10, 114, 411, 40);
 		contentPane.add(scrollPaneList);
 	}
 	

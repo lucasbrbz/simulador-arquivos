@@ -14,13 +14,11 @@ import javax.swing.JOptionPane;
 import model.Bloco;
 import model.HD;
 import model.Node;
-import view.EditarView;
 import view.PrincipalView;
 
 public class Main {
 	
 	private static PrincipalView principalFrame = new PrincipalView();
-	private static EditarView editarFrame;
 	private static LinkedHashMap<String,Node> tabelaNodes = new LinkedHashMap<String,Node>();
 	private static ArrayList<Bloco> listaBlocos = new ArrayList<Bloco>();
 	private static HD disco;
@@ -63,15 +61,6 @@ public class Main {
 		atualizaTextField();
 	}
 	
-	public static void callEditarFrame(String nomearq) {
-		editarFrame = new EditarView(nomearq);
-		editarFrame.setVisible(true);
-	}
-	
-	public static EditarView getEditarFrame() {
-		return editarFrame;
-	}
-	
 	public static HD getDisco() {
 		return disco;
 	}
@@ -93,7 +82,7 @@ public class Main {
 		principalFrame.getTextFieldTamanhoBloco().setText(Integer.toString(disco.getTamanhoBloco()));
 	}
 	
-	private static void preencheListaBlocos() {
+	public static void preencheListaBlocos() {
 		listaBlocos = new ArrayList<Bloco>();
 		for(int i=0;i<disco.getNumBlocos();i++) {
 			Bloco b = new Bloco(i*Main.getDisco().getTamanhoBloco());
@@ -104,11 +93,7 @@ public class Main {
 	public static void montaJList() {
 		principalFrame.getJList().setSize(disco.getTamanho(),1);
 		for(int i=0;i<disco.getTamanho();i++) {
-			principalFrame.getListModel().add(i,' ');
+			principalFrame.getListModel().add(i,'-');
 		}
-	}
-	
-	public static void atualizaJList() {
-		
 	}
 }

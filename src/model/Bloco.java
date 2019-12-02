@@ -14,7 +14,7 @@ public class Bloco {
 	}
 
 	public boolean estaOcupado() {
-		return ocupado;
+		return (ocupado) ? true : false;
 	}
 	
 	public void ocupar() {
