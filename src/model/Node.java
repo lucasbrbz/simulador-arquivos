@@ -38,6 +38,10 @@ public class Node {
 		return id;
 	}
 	
+	public String getPermissao() {
+		return permissao;
+	}
+	
 	public static void addNode() {
 		nINodes++;
 	}

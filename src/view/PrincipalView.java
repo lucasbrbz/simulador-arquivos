@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 
 import controller.Main;
@@ -101,12 +102,12 @@ public class PrincipalView extends JFrame {
 				try {
 					int count = 0;
 					for(Bloco b : Main.getListaBlocos()) {
-						if(b.estaOcupado()) count++;
+						if(b.estaOcupado() == true) count++;
 					}
-					if(count == Main.getDisco().getNumBlocos()) throw new Exception();
+					if(count == Main.getDisco().getNumBlocos()) throw new NullPointerException();
 					String arquivo = JOptionPane.showInputDialog(contentPane,"Nome do arquivo:","Criar arquivo",JOptionPane.INFORMATION_MESSAGE) + ".txt";
+					if(arquivo.equals("null.txt")) throw new Exception();
 					for(String file : Main.getTabela().keySet()) if(file.equals(arquivo)) throw new Exception();
-					if(arquivo.equals("") || arquivo.equals(null)) throw new Exception();
 					String[] opcoes = {"Leitura","Escrita","Leitura/Escrita"};
 					String permissao = null;
 					switch((String) JOptionPane.showInputDialog(contentPane,"Escolha o tipo de permissão:","Criar arquivo",JOptionPane.INFORMATION_MESSAGE,null, opcoes,opcoes[0])) {
@@ -155,6 +156,8 @@ public class PrincipalView extends JFrame {
 						JOptionPane.showMessageDialog(contentPane, "Arquivo criado com sucesso!", "Criar arquivo", JOptionPane.INFORMATION_MESSAGE);
 						adicionaFrameTabela(arquivo);
 					}
+				} catch (NullPointerException n) {
+					JOptionPane.showMessageDialog(null, "Disco cheio!", "Erro", JOptionPane.ERROR_MESSAGE);
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(null, "Impossível criar o arquivo/arquivo já existente!", "Erro", JOptionPane.ERROR_MESSAGE);
 				}
@@ -170,11 +173,34 @@ public class PrincipalView extends JFrame {
 					String[] opcoes = carregaTabela();
 					String arquivo = (String) JOptionPane.showInputDialog(contentPane,null,"Escolha o arquivo",JOptionPane.INFORMATION_MESSAGE,null, opcoes,opcoes[0]);
 					String texto = JOptionPane.showInputDialog(contentPane,null,"Editar arquivo - " + arquivo,JOptionPane.INFORMATION_MESSAGE);
-					int posicaoTexto = 0;
+					int posicaoTexto = 0, k = 0;
 					boolean terminou = false;
+					int[] referencias = new int[12];
+					for(String s : Main.getTabela().keySet()) {
+						if(s.equals(arquivo)) {
+							Main.getTabela().get(s).setDataModificacao();
+							referencias = Main.getTabela().get(s).getReferencias();
+							break;
+						}
+					}
 					for(Bloco b : Main.getListaBlocos()) {
-						if(b.estaOcupado() == false) {
+						if(b.getPosicao() == referencias[k]) {
+							for(int i=posicaoTexto,j=b.getPosicao();i<texto.length();i++,j++) {
+								Main.getDisco().getVetorDisco()[j] = texto.charAt(i);
+								modelList.setElementAt(texto.charAt(i),j);
+								if(i == texto.length() - 1) terminou = true;
+								if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
+									posicaoTexto = i+1;
+									break;
+								}
+							}
+							k++;
+							if(terminou) break;
+						}
+						else if(!terminou && b.estaOcupado() == false) {
 							b.ocupar();
+							Node inode = new Node(texto.length(),Main.getTabela().get(arquivo).getPermissao());
+							inode.addReferencia(b.getPosicao());
 							for(int i=posicaoTexto,j=b.getPosicao();i<texto.length();i++,j++) {
 								Main.getDisco().getVetorDisco()[j] = texto.charAt(i);
 								modelList.setElementAt(texto.charAt(i),j);
@@ -212,7 +238,46 @@ public class PrincipalView extends JFrame {
 				try {
 					String[] opcoes = carregaTabela();
 					String arquivo = (String) JOptionPane.showInputDialog(contentPane,"Escolha o arquivo a ser removido:","Remover arquivo",JOptionPane.INFORMATION_MESSAGE,null, opcoes,opcoes[0]);
+					int posicaoTexto = 0, k = 0, tamanhoTexto = Main.getTabela().get(arquivo).getTamanho();
+					boolean terminou = false;
+					int[] referencias = new int[12];
 					if(arquivo.equals(null)) throw new Exception();
+					for(String s : Main.getTabela().keySet()) {
+						if(s.equals(arquivo)) {
+							referencias = Main.getTabela().get(s).getReferencias();
+							break;
+						}
+					}
+					for(Bloco b : Main.getListaBlocos()) {
+						if(b.getPosicao() == referencias[k]) {
+							for(int i=posicaoTexto,j=b.getPosicao();i<tamanhoTexto;i++,j++) {
+								Main.getDisco().getVetorDisco()[j] = '-';
+								modelList.setElementAt('-',j);
+								if(i == tamanhoTexto - 1) terminou = true;
+								if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
+									posicaoTexto = i+1;
+									break;
+								}
+							}
+							k++;
+							if(terminou) break;
+						}
+						else if(!terminou && b.estaOcupado() == false) {
+							b.ocupar();
+							Node inode = new Node(tamanhoTexto,Main.getTabela().get(arquivo).getPermissao());
+							inode.addReferencia(b.getPosicao());
+							for(int i=posicaoTexto,j=b.getPosicao();i<tamanhoTexto;i++,j++) {
+								Main.getDisco().getVetorDisco()[j] = '-';
+								modelList.setElementAt('-',j);
+								if(i == tamanhoTexto - 1) terminou = true;
+								if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
+									posicaoTexto = i+1;
+									break;
+								}
+							}
+							if(terminou) break;
+						}
+					}
 					Main.getTabela().remove(arquivo);
 					JOptionPane.showMessageDialog(null, "Arquivo removido com sucesso!", "Remover arquivo", JOptionPane.INFORMATION_MESSAGE);
 					for(int i=0;i<table.getRowCount();i++) {
@@ -243,7 +308,7 @@ public class PrincipalView extends JFrame {
 						for(String key : Main.getTabela().keySet()) Main.getTabela().remove(key);
 						for(int i=0;i<Main.getDisco().getTamanho();i++) {
 							System.out.println(1);
-							modelList.setElementAt('-',i);;
+							modelList.setElementAt('-',i);
 							model.removeRow(i);
 							Main.getDisco().getVetorDisco()[i] = ' ';
 						}
@@ -258,7 +323,6 @@ public class PrincipalView extends JFrame {
 				} catch(Exception e1) {
 					
 				}
-				
 			}
 		});
 		mnDisco.add(mntmFormatarDisco);
@@ -269,17 +333,18 @@ public class PrincipalView extends JFrame {
 		JMenuItem mntmSalvarEstadoAtual = new JMenuItem("Salvar estado atual");
 		mntmSalvarEstadoAtual.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser chooser = new JFileChooser();
-				chooser.setCurrentDirectory(new File("./"));
+				JFileChooser chooser = new JFileChooser("./");
+				chooser.setSelectedFile(new File("./disco.dat"));
 			    if(chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
 			    	try(FileOutputStream f = new FileOutputStream(chooser.getSelectedFile()+".dat")) {
 			    		ObjectOutputStream o = new ObjectOutputStream(f);
+			    	    Main.getDisco().setTabelaNodes(Main.getTabela());
 			    	    o.writeObject(Main.getDisco());
 			    	    o.flush();
 			    	    o.close();
 			    	    JOptionPane.showMessageDialog(null, "Salvo com sucesso!","Sucesso", JOptionPane.INFORMATION_MESSAGE);
 			    	} catch(Exception ex) {
-			            ex.printStackTrace();
+			    		JOptionPane.showMessageDialog(null, "Impossível salvar arquivo!", "Erro", JOptionPane.ERROR_MESSAGE);
 			        }
 			    }
 			}
@@ -289,8 +354,7 @@ public class PrincipalView extends JFrame {
 		JMenuItem mntmCarregarDeUm = new JMenuItem("Carregar de um arquivo");
 		mntmCarregarDeUm.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser chooser = new JFileChooser();
-				chooser.setCurrentDirectory(new File("./"));
+				JFileChooser chooser = new JFileChooser("./");
 				if(chooser.showOpenDialog(contentPane) == JFileChooser.APPROVE_OPTION) {
 					try(FileInputStream f = new FileInputStream(chooser.getSelectedFile())) {
 			    		ObjectInputStream o = new ObjectInputStream(f);
@@ -298,7 +362,7 @@ public class PrincipalView extends JFrame {
 			    	    o.close();
 			    	    JOptionPane.showMessageDialog(null, "Arquivo carregado com sucesso!","Sucesso", JOptionPane.INFORMATION_MESSAGE);
 			    	} catch(Exception ex) {
-			            ex.printStackTrace();
+			    		JOptionPane.showMessageDialog(null, "Impossível carregar arquivo!", "Erro", JOptionPane.ERROR_MESSAGE);
 			        }
 				}
 			}

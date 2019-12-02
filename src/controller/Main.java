@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
 
 import model.Bloco;
 import model.HD;
@@ -26,25 +27,26 @@ public class Main {
 	public static void main(String[] args) {
 		principalFrame.setVisible(true);
 		if(!(new File("./disco.dat")).exists()) {
-			int tamanho = Integer.parseInt(JOptionPane.showInputDialog(null,"Tamanho do disco:","Criar disco rígido",JOptionPane.INFORMATION_MESSAGE));
-			int tBloco = Integer.parseInt(JOptionPane.showInputDialog(null,"Tamanho dos blocos:","Criar disco rígido",JOptionPane.INFORMATION_MESSAGE));
-			disco = new HD(tamanho,tBloco);
-			preencheListaBlocos();
-			JFileChooser chooser = new JFileChooser();
-			File file = new File("./disco.dat");
-			chooser.setCurrentDirectory(new File("./"));
-		    if(chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
-		    	chooser.setSelectedFile(file);
-		    	try(FileOutputStream f = new FileOutputStream(chooser.getSelectedFile())) {
-		    		ObjectOutputStream o = new ObjectOutputStream(f);
-		    	    o.writeObject(Main.getDisco());
-		    	    o.flush();
-		    	    o.close();
-		    	    JOptionPane.showMessageDialog(null,"Disco criado com sucesso!","Sucesso", JOptionPane.INFORMATION_MESSAGE);
-		    	} catch(Exception ex) {
-		            ex.printStackTrace();
-		        }
-		    }
+			int tamanho = 0,tBloco = 0;
+			try {
+				tamanho = Integer.parseInt(JOptionPane.showInputDialog(null,"Tamanho do disco:","Criar disco rígido",JOptionPane.INFORMATION_MESSAGE));
+				tBloco = Integer.parseInt(JOptionPane.showInputDialog(null,"Tamanho dos blocos:","Criar disco rígido",JOptionPane.INFORMATION_MESSAGE));
+				disco = new HD(tamanho,tBloco);
+				preencheListaBlocos();
+				JFileChooser chooser = new JFileChooser("./");
+				chooser.setSelectedFile(new File("./disco.dat"));
+			    if(chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+			    	FileOutputStream f = new FileOutputStream(chooser.getSelectedFile());
+			    	ObjectOutputStream o = new ObjectOutputStream(f);
+			    	Main.getDisco().setTabelaNodes(tabelaNodes);
+			    	o.writeObject(Main.getDisco());
+			    	o.flush();
+			    	o.close();
+			    	JOptionPane.showMessageDialog(null,"Disco criado com sucesso!","Sucesso", JOptionPane.INFORMATION_MESSAGE);
+			    } else throw new Exception();
+			} catch(Exception ex) {
+	    		JOptionPane.showMessageDialog(null, "Impossível criar o disco!", "Erro", JOptionPane.ERROR_MESSAGE);
+	        }
 		}
 		else {
 			try(FileInputStream f = new FileInputStream("./disco.dat")) {
@@ -54,7 +56,7 @@ public class Main {
 	    	    preencheListaBlocos();
 	    	    JOptionPane.showMessageDialog(null, "Disco carregado com sucesso!","Sucesso", JOptionPane.INFORMATION_MESSAGE);
 	    	} catch(Exception ex) {
-	            ex.printStackTrace();
+	    		JOptionPane.showMessageDialog(null, "Impossível carregar o disco!", "Erro", JOptionPane.ERROR_MESSAGE);
 	        }
 		}
 		montaJList();
@@ -75,6 +77,7 @@ public class Main {
 	
 	public static void configuraDisco(Object discoArquivo) {
 		 disco = (HD) discoArquivo;
+		 tabelaNodes = disco.getTabelaNodes();
 	}
 	
 	public static void atualizaTextField() {
