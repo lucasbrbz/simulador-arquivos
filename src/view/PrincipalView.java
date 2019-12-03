@@ -101,11 +101,7 @@ public class PrincipalView extends JFrame {
 		mntmCriarArquivo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					int count = 0;
-					for(Bloco b : Main.getListaBlocos()) {
-						if(b.estaOcupado() == true) count++;
-					}
-					if(count == Main.getDisco().getNumBlocos()) throw new NullPointerException();
+					if(Main.getListaBlocos().isEmpty()) throw new NullPointerException();
 					String arquivo = JOptionPane.showInputDialog(contentPane,"Nome do arquivo:","Criar arquivo",JOptionPane.INFORMATION_MESSAGE) + ".txt";
 					if(arquivo.equals("null.txt")) throw new Exception();
 					for(String file : HD.getTabela().keySet()) if(file.equals(arquivo)) throw new Exception();
@@ -130,20 +126,18 @@ public class PrincipalView extends JFrame {
 						boolean terminou = false;
 						Node inode = new Node(texto.length(),permissao);
 						for(Bloco b : Main.getListaBlocos()) {
-							if(b.estaOcupado() == false) {
-								b.ocupar();
-								inode.addReferencia(b.getPosicao());
-								for(int i=posicaoTexto,j=b.getPosicao();i<texto.length();i++,j++) {
-									Main.getDisco().getVetorDisco()[j] = texto.charAt(i);
-									modelList.setElementAt(texto.charAt(i),j);
-									if(i == texto.length() - 1) terminou = true;
-									if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
-										posicaoTexto = i+1;
-										break;
-									}
+							inode.addReferencia(b.getPosicao());
+							for(int i=posicaoTexto,j=b.getPosicao();i<texto.length();i++,j++) {
+								Main.getDisco().getVetorDisco()[j] = texto.charAt(i);
+								modelList.setElementAt(texto.charAt(i),j);
+								if(i == texto.length() - 1) terminou = true;
+								if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
+									posicaoTexto = i+1;
+									break;
 								}
-								if(terminou) break;
 							}
+							Main.getListaBlocos().remove(b);
+							if(terminou) break;
 						}
 						Node.addNode();
 						HD.getTabela().put(arquivo, inode);
@@ -196,10 +190,10 @@ public class PrincipalView extends JFrame {
 								}
 							}
 							k++;
+							Main.getListaBlocos().remove(b);
 							if(terminou) break;
 						}
-						else if(!terminou && b.estaOcupado() == false) {
-							b.ocupar();
+						else if(!terminou) {
 							Node inode = new Node(texto.length(),HD.getTabela().get(arquivo).getPermissao());
 							inode.addReferencia(b.getPosicao());
 							for(int i=posicaoTexto,j=b.getPosicao();i<texto.length();i++,j++) {
@@ -249,25 +243,23 @@ public class PrincipalView extends JFrame {
 							break;
 						}
 					}
-					for(Bloco b : Main.getListaBlocos()) {
-						if(b.getPosicao() == referencias[k]) {
-							for(int i=posicaoTexto,j=b.getPosicao();i<tamanhoTexto;i++,j++) {
-								Main.getDisco().getVetorDisco()[j] = '-';
-								modelList.setElementAt('-',j);
-								if(i == tamanhoTexto - 1) terminou = true;
-								if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
-									posicaoTexto = i+1;
-									break;
-								}
+					while(referencias[k] != -1) {
+						for(int i=posicaoTexto,j=referencias[k];i<tamanhoTexto;i++,j++) {
+							Main.getDisco().getVetorDisco()[j] = '-';
+							modelList.setElementAt('-',j);
+							if(i == tamanhoTexto - 1) terminou = true;
+							if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
+								posicaoTexto = i+1;
+								break;
 							}
-							k++;
-							if(terminou) break;
 						}
-						else if(!terminou && b.estaOcupado() == false) {
-							b.ocupar();
+						Main.getListaBlocos().add(new Bloco(referencias[k]));
+						k++;
+						if(terminou) break;
+						else {
 							Node inode = new Node(tamanhoTexto,HD.getTabela().get(arquivo).getPermissao());
-							inode.addReferencia(b.getPosicao());
-							for(int i=posicaoTexto,j=b.getPosicao();i<tamanhoTexto;i++,j++) {
+							inode.addReferencia(referencias[k]);
+							for(int i=posicaoTexto,j=referencias[k];i<tamanhoTexto;i++,j++) {
 								Main.getDisco().getVetorDisco()[j] = '-';
 								modelList.setElementAt('-',j);
 								if(i == tamanhoTexto - 1) terminou = true;
