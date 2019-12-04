@@ -6,15 +6,10 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
-
 import model.Bloco;
 import model.HD;
-import model.Node;
 import view.PrincipalView;
 
 public class Main {
@@ -37,7 +32,7 @@ public class Main {
 			    if(chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
 			    	FileOutputStream f = new FileOutputStream(chooser.getSelectedFile());
 			    	ObjectOutputStream o = new ObjectOutputStream(f);
-			    	Main.getDisco().setTabelaNodes(disco.getTabelaNodes());
+			    	Main.getDisco().setTabelaNodes(HD.getTabelaNodes());
 			    	o.writeObject(Main.getDisco());
 			    	o.flush();
 			    	o.close();
@@ -55,10 +50,18 @@ public class Main {
 	    	    Main.configuraDisco(o.readObject());
 	    	    o.close();
 	    	    preencheListaBlocos();
+	    	    montaJList(false);
 	    	    principalFrame.getJList().setSize(disco.getTamanho(),1);
-				disco.getTabelaNodes().forEach((k,v) -> {
+				HD.getTabelaNodes().forEach((k,v) -> {
 					principalFrame.adicionaFrameTabela(k);
-					// adicionar no jlist
+					int[] referencias = v.getReferencias();
+					int i = 0;
+					while(referencias[i] != -1) {
+						for(int j=referencias[i];j%Main.getDisco().getTamanhoBloco() != 0;j++) {
+							principalFrame.getListModel().add(j,Main.getDisco().getVetorDisco()[i]);
+						}
+						i++;
+					}
 				});
 				atualizaTextField();
 	    	    JOptionPane.showMessageDialog(null, "Disco carregado com sucesso!","Sucesso", JOptionPane.INFORMATION_MESSAGE);

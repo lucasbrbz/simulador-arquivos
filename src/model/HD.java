@@ -16,7 +16,7 @@ public class HD implements Serializable {
 		this.nBlocos = (tamanho/tBloco);
 	}
 	
-	public static LinkedHashMap<String,Node> getTabela() {
+	public static LinkedHashMap<String,Node> getTabelaNodes() {
 		return tabelaNodes;
 	}
 	
@@ -49,11 +49,7 @@ public class HD implements Serializable {
 	}
 	
 	public void setTabelaNodes(LinkedHashMap<String,Node> tabela) {
-		this.tabelaNodes = tabela;
-	}
-	
-	public LinkedHashMap<String,Node> getTabelaNodes() {
-		return tabelaNodes;
+		HD.tabelaNodes = tabela;
 	}
 	
 }

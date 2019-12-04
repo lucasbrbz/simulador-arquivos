@@ -104,7 +104,7 @@ public class PrincipalView extends JFrame {
 					if(Main.getListaBlocos().isEmpty()) throw new NullPointerException();
 					String arquivo = JOptionPane.showInputDialog(contentPane,"Nome do arquivo:","Criar arquivo",JOptionPane.INFORMATION_MESSAGE) + ".txt";
 					if(arquivo.equals("null.txt")) throw new Exception();
-					for(String file : HD.getTabela().keySet()) if(file.equals(arquivo)) throw new Exception();
+					for(String file : HD.getTabelaNodes().keySet()) if(file.equals(arquivo)) throw new Exception();
 					String[] opcoes = {"Leitura","Escrita","Leitura/Escrita"};
 					String permissao = null;
 					switch((String) JOptionPane.showInputDialog(contentPane,"Escolha o tipo de permissão:","Criar arquivo",JOptionPane.INFORMATION_MESSAGE,null, opcoes,opcoes[0])) {
@@ -124,8 +124,9 @@ public class PrincipalView extends JFrame {
 						String texto = JOptionPane.showInputDialog(contentPane,null,"Editar arquivo - " + arquivo,JOptionPane.INFORMATION_MESSAGE);
 						int posicaoTexto = 0;
 						boolean terminou = false;
-						Node inode = new Node(texto.length(),permissao);
-						for(Bloco b : Main.getListaBlocos()) {
+						Node inode = new Node(texto.length(),permissao);						
+						while(!terminou) {
+							Bloco b = Main.getListaBlocos().get(0);
 							inode.addReferencia(b.getPosicao());
 							for(int i=posicaoTexto,j=b.getPosicao();i<texto.length();i++,j++) {
 								Main.getDisco().getVetorDisco()[j] = texto.charAt(i);
@@ -137,17 +138,16 @@ public class PrincipalView extends JFrame {
 								}
 							}
 							Main.getListaBlocos().remove(b);
-							if(terminou) break;
 						}
 						Node.addNode();
-						HD.getTabela().put(arquivo, inode);
+						HD.getTabelaNodes().put(arquivo, inode);
 						JOptionPane.showMessageDialog(contentPane, "Arquivo criado com sucesso!", "Criar arquivo", JOptionPane.INFORMATION_MESSAGE);
 						adicionaFrameTabela(arquivo);
 					}
 					else if(editar == 1) {
 						Node inode = new Node(0,permissao);
 						Node.addNode();
-						HD.getTabela().put(arquivo, inode);
+						HD.getTabelaNodes().put(arquivo, inode);
 						JOptionPane.showMessageDialog(contentPane, "Arquivo criado com sucesso!", "Criar arquivo", JOptionPane.INFORMATION_MESSAGE);
 						adicionaFrameTabela(arquivo);
 					}
@@ -164,58 +164,44 @@ public class PrincipalView extends JFrame {
 		mntmEditarArquivo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					Object[] dados = null;
 					String[] opcoes = carregaTabela();
 					String arquivo = (String) JOptionPane.showInputDialog(contentPane,null,"Escolha o arquivo",JOptionPane.INFORMATION_MESSAGE,null, opcoes,opcoes[0]);
 					String texto = JOptionPane.showInputDialog(contentPane,null,"Editar arquivo - " + arquivo,JOptionPane.INFORMATION_MESSAGE);
 					int posicaoTexto = 0, k = 0;
 					boolean terminou = false;
 					int[] referencias = new int[12];
-					for(String s : HD.getTabela().keySet()) {
+					for(String s : HD.getTabelaNodes().keySet()) {
 						if(s.equals(arquivo)) {
-							HD.getTabela().get(s).setDataModificacao();
-							referencias = HD.getTabela().get(s).getReferencias();
+							HD.getTabelaNodes().get(s).setDataModificacao();
+							referencias = HD.getTabelaNodes().get(s).getReferencias();
 							break;
 						}
 					}
-					for(Bloco b : Main.getListaBlocos()) {
-						if(b.getPosicao() == referencias[k]) {
-							for(int i=posicaoTexto,j=b.getPosicao();i<texto.length();i++,j++) {
-								Main.getDisco().getVetorDisco()[j] = texto.charAt(i);
-								modelList.setElementAt(texto.charAt(i),j);
-								if(i == texto.length() - 1) terminou = true;
-								if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
-									posicaoTexto = i+1;
-									break;
-								}
+					while(!terminou) {
+						for(int i=posicaoTexto,j=(referencias[0] != -1) ? referencias[k] : 0;i<texto.length();i++,j++) {
+							Main.getDisco().getVetorDisco()[j] = texto.charAt(i);
+							modelList.setElementAt(texto.charAt(i),j);
+							if(i == texto.length() - 1) terminou = true;
+							if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
+								posicaoTexto = i+1;
+								break;
 							}
-							k++;
-							Main.getListaBlocos().remove(b);
-							if(terminou) break;
 						}
-						else if(!terminou) {
-							Node inode = new Node(texto.length(),HD.getTabela().get(arquivo).getPermissao());
-							inode.addReferencia(b.getPosicao());
-							for(int i=posicaoTexto,j=b.getPosicao();i<texto.length();i++,j++) {
-								Main.getDisco().getVetorDisco()[j] = texto.charAt(i);
-								modelList.setElementAt(texto.charAt(i),j);
-								if(i == texto.length() - 1) terminou = true;
-								if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
-									posicaoTexto = i+1;
-									break;
-								}
-							}
-							if(terminou) break;
-						}
+						k++;
+						Main.getListaBlocos().remove(0);
+						HD.getTabelaNodes().get(arquivo).addReferencia(Main.getListaBlocos().get(0).getPosicao());
+						if(terminou) {
+							break;
+						}					
 					}
-					HD.getTabela().get(arquivo).setTamanho(texto.length());
+					HD.getTabelaNodes().get(arquivo).setTamanho(texto.length());
 					for(int i=0;i<table.getRowCount();i++) {
 						if(model.getValueAt(i,0).equals(arquivo)) {
 							model.setValueAt(arquivo, i, 0);
-							model.setValueAt(HD.getTabela().get(arquivo).getTamanho(), i, 1);
-							model.setValueAt(HD.getTabela().get(arquivo).getID(), i, 2);
-							model.setValueAt(HD.getTabela().get(arquivo).getDataCriacao(), i, 3);
-							model.setValueAt(HD.getTabela().get(arquivo).getDataModificacao(), i, 4);
+							model.setValueAt(HD.getTabelaNodes().get(arquivo).getTamanho(), i, 1);
+							model.setValueAt(HD.getTabelaNodes().get(arquivo).getID(), i, 2);
+							model.setValueAt(HD.getTabelaNodes().get(arquivo).getDataCriacao(), i, 3);
+							model.setValueAt(HD.getTabelaNodes().get(arquivo).getDataModificacao(), i, 4);
 							break;
 						}
 					}
@@ -233,13 +219,13 @@ public class PrincipalView extends JFrame {
 				try {
 					String[] opcoes = carregaTabela();
 					String arquivo = (String) JOptionPane.showInputDialog(contentPane,"Escolha o arquivo a ser removido:","Remover arquivo",JOptionPane.INFORMATION_MESSAGE,null, opcoes,opcoes[0]);
-					int posicaoTexto = 0, k = 0, tamanhoTexto = HD.getTabela().get(arquivo).getTamanho();
+					int posicaoTexto = 0, k = 0, tamanhoTexto = HD.getTabelaNodes().get(arquivo).getTamanho();
 					boolean terminou = false;
 					int[] referencias = new int[12];
 					if(arquivo.equals(null)) throw new Exception();
-					for(String s : HD.getTabela().keySet()) {
+					for(String s : HD.getTabelaNodes().keySet()) {
 						if(s.equals(arquivo)) {
-							referencias = HD.getTabela().get(s).getReferencias();
+							referencias = HD.getTabelaNodes().get(s).getReferencias();
 							break;
 						}
 					}
@@ -257,7 +243,7 @@ public class PrincipalView extends JFrame {
 						k++;
 						if(terminou) break;
 						else {
-							Node inode = new Node(tamanhoTexto,HD.getTabela().get(arquivo).getPermissao());
+							Node inode = new Node(tamanhoTexto,HD.getTabelaNodes().get(arquivo).getPermissao());
 							inode.addReferencia(referencias[k]);
 							for(int i=posicaoTexto,j=referencias[k];i<tamanhoTexto;i++,j++) {
 								Main.getDisco().getVetorDisco()[j] = '-';
@@ -271,7 +257,7 @@ public class PrincipalView extends JFrame {
 							if(terminou) break;
 						}
 					}
-					HD.getTabela().remove(arquivo);
+					HD.getTabelaNodes().remove(arquivo);
 					JOptionPane.showMessageDialog(null, "Arquivo removido com sucesso!", "Remover arquivo", JOptionPane.INFORMATION_MESSAGE);
 					for(int i=0;i<table.getRowCount();i++) {
 						if(model.getValueAt(i,0).equals(arquivo)) {
@@ -298,11 +284,11 @@ public class PrincipalView extends JFrame {
 					int tDisco = Integer.parseInt(JOptionPane.showInputDialog(contentPane,"Tamanho do disco:","Formatar disco",JOptionPane.INFORMATION_MESSAGE));
 					int tBloco = Integer.parseInt(JOptionPane.showInputDialog(contentPane,"Tamanho do bloco:","Formatar disco",JOptionPane.INFORMATION_MESSAGE));
 					if(tDisco%tBloco == 0) {
-						if(!HD.getTabela().isEmpty()) {
-							for(int i=0;i<HD.getTabela().size();i++) {
+						if(!HD.getTabelaNodes().isEmpty()) {
+							for(int i=0;i<HD.getTabelaNodes().size();i++) {
 								model.removeRow(0);
 							}
-							HD.getTabela().clear();
+							HD.getTabelaNodes().clear();
 						}
 						Main.getDisco().novoVetorDisco(tDisco);
 						Main.getDisco().setTamanho(tDisco);
@@ -333,7 +319,7 @@ public class PrincipalView extends JFrame {
 			    if(chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
 			    	try(FileOutputStream f = new FileOutputStream(chooser.getSelectedFile()+".dat")) {
 			    		ObjectOutputStream o = new ObjectOutputStream(f);
-			    	    Main.getDisco().setTabelaNodes(HD.getTabela());
+			    	    Main.getDisco().setTabelaNodes(HD.getTabelaNodes());
 			    	    o.writeObject(Main.getDisco());
 			    	    o.flush();
 			    	    o.close();
@@ -399,9 +385,9 @@ public class PrincipalView extends JFrame {
 	}
 	
 	public String[] carregaTabela() {
-		String[] opcoes = new String[HD.getTabela().size()];	
+		String[] opcoes = new String[HD.getTabelaNodes().size()];	
         int i = 0;
-        for(String arquivo : HD.getTabela().keySet()){
+        for(String arquivo : HD.getTabelaNodes().keySet()){
         	opcoes[i] = arquivo;
         	i++;
         }
@@ -411,10 +397,10 @@ public class PrincipalView extends JFrame {
 	public void adicionaFrameTabela(String arquivo) {
 		model.addRow(new Object[]{
 			arquivo,
-			HD.getTabela().get(arquivo).getTamanho(),
-			HD.getTabela().get(arquivo).getID(),
-			HD.getTabela().get(arquivo).getDataCriacao(),
-			HD.getTabela().get(arquivo).getDataModificacao()
+			HD.getTabelaNodes().get(arquivo).getTamanho(),
+			HD.getTabelaNodes().get(arquivo).getID(),
+			HD.getTabelaNodes().get(arquivo).getDataCriacao(),
+			HD.getTabelaNodes().get(arquivo).getDataModificacao()
 			});
 	}
 	
