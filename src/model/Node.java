@@ -1,8 +1,9 @@
 package model;
 
+import java.io.Serializable;
 import java.util.Calendar;
 
-public class Node {
+public class Node implements Serializable {
 	private static int nINodes = 0;
 	private int tamanho,id,ultimaPosicao = 0;
 	private int[] referencias = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};

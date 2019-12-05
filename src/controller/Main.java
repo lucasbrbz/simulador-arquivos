@@ -32,7 +32,7 @@ public class Main {
 			    if(chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
 			    	FileOutputStream f = new FileOutputStream(chooser.getSelectedFile());
 			    	ObjectOutputStream o = new ObjectOutputStream(f);
-			    	Main.getDisco().setTabelaNodes(HD.getTabelaNodes());
+			    	Main.getDisco().setTabelaNodes(Main.getDisco().getTabelaNodes());
 			    	o.writeObject(Main.getDisco());
 			    	o.flush();
 			    	o.close();
@@ -52,14 +52,20 @@ public class Main {
 	    	    preencheListaBlocos();
 	    	    montaJList(false);
 	    	    principalFrame.getJList().setSize(disco.getTamanho(),1);
-				HD.getTabelaNodes().forEach((k,v) -> {
+				Main.getDisco().getTabelaNodes().forEach((k,v) -> {
 					principalFrame.adicionaFrameTabela(k);
 					int[] referencias = v.getReferencias();
 					int i = 0;
 					while(referencias[i] != -1) {
-						for(int j=referencias[i];j%Main.getDisco().getTamanhoBloco() != 0;j++) {
-							principalFrame.getListModel().add(j,Main.getDisco().getVetorDisco()[i]);
-						}
+						int j = referencias[i];
+						do {
+							if(disco.getVetorDisco()[j] == '-') {
+								principalFrame.getListModel().setElementAt('-',j);
+							} else {
+								principalFrame.getListModel().setElementAt(disco.getVetorDisco()[j],j);
+							}
+							j++;
+						} while(j%disco.getTamanhoBloco() != 0);
 						i++;
 					}
 				});

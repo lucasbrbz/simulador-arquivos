@@ -7,16 +7,19 @@ public class HD implements Serializable {
 	
 	private char[] disco;
 	private int tamanho,tBloco,nBlocos;
-	private static LinkedHashMap<String,Node> tabelaNodes = new LinkedHashMap<String,Node>();
+	private LinkedHashMap<String,Node> tabelaNodes = new LinkedHashMap<String,Node>();
 
 	public HD(int tamanho,int tBloco) {
 		this.disco = new char[tamanho];
+		for(int i=0;i<tamanho;i++) {
+			disco[i] = '-';
+		}
 		this.tamanho = tamanho;
 		this.tBloco = tBloco;
 		this.nBlocos = (tamanho/tBloco);
 	}
 	
-	public static LinkedHashMap<String,Node> getTabelaNodes() {
+	public LinkedHashMap<String,Node> getTabelaNodes() {
 		return tabelaNodes;
 	}
 	
@@ -49,7 +52,7 @@ public class HD implements Serializable {
 	}
 	
 	public void setTabelaNodes(LinkedHashMap<String,Node> tabela) {
-		HD.tabelaNodes = tabela;
+		tabelaNodes = tabela;
 	}
 	
 }
