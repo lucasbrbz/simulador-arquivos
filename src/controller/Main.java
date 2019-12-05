@@ -58,18 +58,21 @@ public class Main {
 					int i = 0;
 					while(referencias[i] != -1) {
 						int j = referencias[i];
-						if(listaBlocos.get(0).getPosicao() == referencias[i]) {
-							listaBlocos.remove(0);
-							do {
-								if(disco.getVetorDisco()[j] == '-') {
-									principalFrame.getListModel().setElementAt('-',j);
-								} else {
-									principalFrame.getListModel().setElementAt(disco.getVetorDisco()[j],j);
-								}
-								j++;
-							} while(j%disco.getTamanhoBloco() != 0);
-							i++;
+						for(Bloco b : listaBlocos) {
+							if(b.getPosicao() == referencias[i]) {
+								listaBlocos.remove(b);
+								break;
+							}
 						}
+						do {
+							if(disco.getVetorDisco()[j] == '-') {
+								principalFrame.getListModel().setElementAt('-',j);
+							} else {
+								principalFrame.getListModel().setElementAt(disco.getVetorDisco()[j],j);
+							}
+							j++;
+						} while(j%disco.getTamanhoBloco() != 0);
+						i++;
 					}
 				});
 				atualizaTextField();
