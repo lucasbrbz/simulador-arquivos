@@ -4,8 +4,7 @@ import java.io.Serializable;
 import java.util.Calendar;
 
 public class Node implements Serializable {
-	private static int nINodes = 0;
-	private int tamanho,id,ultimaPosicao = 0;
+	private int tamanho,ultimaPosicao = 0;
 	private int[] referencias = {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
 	private String permissao,datacriacao,ultimamodificacao,arquivo;
 	
@@ -15,7 +14,6 @@ public class Node implements Serializable {
 		this.permissao = permissao;
 		this.datacriacao = c.get(Calendar.DATE) + "/" + (c.get(Calendar.MONTH)+1) + "/" + c.get(Calendar.YEAR);
 		this.ultimamodificacao = this.datacriacao;
-		this.id = nINodes;
 	}
 	
 	public int[] getReferencias() {
@@ -35,20 +33,8 @@ public class Node implements Serializable {
 		return tamanho;
 	}
 	
-	public int getID() {
-		return id;
-	}
-	
 	public String getPermissao() {
 		return permissao;
-	}
-	
-	public static void addNode() {
-		nINodes++;
-	}
-	
-	public static void zeraNodeID() {
-		nINodes = 0;
 	}
 	
 	public String getDataCriacao() {

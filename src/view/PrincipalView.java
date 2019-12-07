@@ -138,14 +138,12 @@ public class PrincipalView extends JFrame {
 							}
 							Main.getListaBlocos().remove(b);
 						}
-						Node.addNode();
 						Main.getDisco().getTabelaNodes().put(arquivo, inode);
 						JOptionPane.showMessageDialog(contentPane, "Arquivo criado com sucesso!", "Criar arquivo", JOptionPane.INFORMATION_MESSAGE);
 						adicionaFrameTabela(arquivo);
 					}
 					else if(editar == 1) {
 						Node inode = new Node(0,permissao);
-						Node.addNode();
 						Main.getDisco().getTabelaNodes().put(arquivo, inode);
 						JOptionPane.showMessageDialog(contentPane, "Arquivo criado com sucesso!", "Criar arquivo", JOptionPane.INFORMATION_MESSAGE);
 						adicionaFrameTabela(arquivo);
@@ -203,9 +201,8 @@ public class PrincipalView extends JFrame {
 						if(model.getValueAt(i,0).equals(arquivo)) {
 							model.setValueAt(arquivo, i, 0);
 							model.setValueAt(Main.getDisco().getTabelaNodes().get(arquivo).getTamanho(), i, 1);
-							model.setValueAt(Main.getDisco().getTabelaNodes().get(arquivo).getID(), i, 2);
-							model.setValueAt(Main.getDisco().getTabelaNodes().get(arquivo).getDataCriacao(), i, 3);
-							model.setValueAt(Main.getDisco().getTabelaNodes().get(arquivo).getDataModificacao(), i, 4);
+							model.setValueAt(Main.getDisco().getTabelaNodes().get(arquivo).getDataCriacao(), i, 2);
+							model.setValueAt(Main.getDisco().getTabelaNodes().get(arquivo).getDataModificacao(), i, 3);
 							break;
 						}
 					}
@@ -298,7 +295,6 @@ public class PrincipalView extends JFrame {
 						Main.getDisco().setTamanho(tDisco);
 						Main.getDisco().setTamanhoBloco(tBloco);
 						Main.montaJList(true);
-						Node.zeraNodeID();
 						Main.atualizaTextField();
 						Main.preencheListaBlocos();
 						JOptionPane.showMessageDialog(null, "Disco formatado com sucesso!", "Formatar disco", JOptionPane.INFORMATION_MESSAGE);
@@ -385,7 +381,7 @@ public class PrincipalView extends JFrame {
 		});
 		mnSimulador.add(mntmCarregarDeUm);
 		
-		table = new JTable(new DefaultTableModel(new Object[][] {},new String[] {"Arquivo","Tamanho","i-Node","Data criação","Última modificação"}));
+		table = new JTable(new DefaultTableModel(new Object[][] {},new String[] {"Arquivo","Tamanho","Data criação","Última modificação"}));
 		table.getTableHeader().setResizingAllowed(false);
 		table.getTableHeader().setReorderingAllowed(false);
 		table.setAutoscrolls(false);
@@ -434,7 +430,6 @@ public class PrincipalView extends JFrame {
 		model.addRow(new Object[]{
 			arquivo,
 			Main.getDisco().getTabelaNodes().get(arquivo).getTamanho(),
-			Main.getDisco().getTabelaNodes().get(arquivo).getID(),
 			Main.getDisco().getTabelaNodes().get(arquivo).getDataCriacao(),
 			Main.getDisco().getTabelaNodes().get(arquivo).getDataModificacao()
 			});
@@ -456,7 +451,6 @@ public class PrincipalView extends JFrame {
 		return modelList;
 	}
 }
-
 
 class CellRenderer extends DefaultListCellRenderer {
 	boolean colore = false;
