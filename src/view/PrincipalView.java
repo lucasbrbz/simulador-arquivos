@@ -102,7 +102,7 @@ public class PrincipalView extends JFrame {
 				try {
 					if(Main.getListaBlocos().isEmpty()) throw new NullPointerException();
 					String arquivo = JOptionPane.showInputDialog(contentPane,"Nome do arquivo:","Criar arquivo",JOptionPane.INFORMATION_MESSAGE) + ".txt";
-					if(arquivo.equals("null.txt")) throw new Exception();
+					if(arquivo.equals("null.txt")|| arquivo.equals(".txt")) throw new Exception();
 					for(String file : Main.getDisco().getTabelaNodes().keySet()) if(file.equals(arquivo)) throw new Exception();
 					String[] opcoes = {"Leitura","Escrita","Leitura/Escrita"};
 					String permissao = null;
@@ -342,9 +342,40 @@ public class PrincipalView extends JFrame {
 				JFileChooser chooser = new JFileChooser("./");
 				if(chooser.showOpenDialog(contentPane) == JFileChooser.APPROVE_OPTION) {
 					try(FileInputStream f = new FileInputStream(chooser.getSelectedFile())) {
-			    		ObjectInputStream o = new ObjectInputStream(f);
+						ObjectInputStream o = new ObjectInputStream(f);
+						for(int i=0;i<Main.getDisco().getTabelaNodes().size();i++) {
+							model.removeRow(0);
+						}
+						Main.getDisco().getTabelaNodes().clear();
 			    	    Main.configuraDisco(o.readObject());
 			    	    o.close();
+			    	    Main.preencheListaBlocos();
+			    	    Main.montaJList(true);
+			    	    list.setSize(Main.getDisco().getTamanho(),1);
+						Main.getDisco().getTabelaNodes().forEach((k,v) -> {
+							adicionaFrameTabela(k);
+							int[] referencias = v.getReferencias();
+							int i = 0;
+							while(referencias[i] != -1) {
+								int j = referencias[i];
+								for(Bloco b : Main.getListaBlocos()) {
+									if(b.getPosicao() == referencias[i]) {
+										Main.getListaBlocos().remove(b);
+										break;
+									}
+								}
+								do {
+									if(Main.getDisco().getVetorDisco()[j] == '-') {
+										modelList.setElementAt('-',j);
+									} else {
+										modelList.setElementAt(Main.getDisco().getVetorDisco()[j],j);
+									}
+									j++;
+								} while(j%Main.getDisco().getTamanhoBloco() != 0);
+								i++;
+							}
+						});
+						Main.atualizaTextField();
 			    	    JOptionPane.showMessageDialog(null, "Arquivo carregado com sucesso!","Sucesso", JOptionPane.INFORMATION_MESSAGE);
 			    	} catch(Exception ex) {
 			    		JOptionPane.showMessageDialog(null, "Impossível carregar arquivo!", "Erro", JOptionPane.ERROR_MESSAGE);
