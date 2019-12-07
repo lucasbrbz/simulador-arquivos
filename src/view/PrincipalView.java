@@ -30,6 +30,8 @@ import javax.swing.JTextField;
 import java.awt.Color;
 import java.awt.Component;
 
+
+
 public class PrincipalView extends JFrame {
 
 	private JPanel contentPane;
@@ -38,6 +40,7 @@ public class PrincipalView extends JFrame {
 	private JTable table,tableBlocos;
 	private DefaultTableModel model,modelTableBlocos;
 	private JTextField textFieldTamanhoDisco,textFieldTamanhoBloco;
+	
 
 	public PrincipalView() {
 		setTitle("Simulador de Sistema de Arquivos");
@@ -49,6 +52,7 @@ public class PrincipalView extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+		
 		
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setBounds(0, 0, 431, 21);
@@ -453,14 +457,23 @@ public class PrincipalView extends JFrame {
 	}
 }
 
+
 class CellRenderer extends DefaultListCellRenderer {
+	boolean colore = false;
     public Component getListCellRendererComponent(JList list,Object value,int index,boolean isSelected,boolean cellHasFocus) {
         Component c = super.getListCellRendererComponent(list,value,index,isSelected,cellHasFocus);
-        if(index%2 == 0) {
+        
+        if(colore) {
             c.setBackground(Color.yellow);
+            if(index % 4 == 3) {
+            	colore = false;
+            }
         }
         else {
-            c.setBackground(Color.white);
+            c.setBackground(Color.white); 
+            if(index % 4 == 3) {
+            	colore = true;
+            }
         }
         return c;
     }
