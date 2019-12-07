@@ -1,5 +1,9 @@
 package view;
 
+import controller.Main;
+import model.*;
+
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -7,17 +11,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-
-import controller.Main;
-import model.Bloco;
-import model.HD;
-import model.Node;
-
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,11 +25,10 @@ import java.awt.event.ActionEvent;
 import javax.swing.JTable;
 import javax.swing.JLabel;
 import javax.swing.JList;
-
 import java.awt.Font;
-
 import javax.swing.JTextField;
 import java.awt.Color;
+import java.awt.Component;
 
 public class PrincipalView extends JFrame {
 
@@ -244,7 +240,6 @@ public class PrincipalView extends JFrame {
 							}
 						}
 						Main.getListaBlocos().add(new Bloco(referencias[k]));
-						k++;
 						if(terminou) break;
 						else {
 							Node inode = new Node(tamanhoTexto,Main.getDisco().getTabelaNodes().get(arquivo).getPermissao());
@@ -260,6 +255,7 @@ public class PrincipalView extends JFrame {
 							}
 							if(terminou) break;
 						}
+						k++;
 					}
 					Main.getDisco().getTabelaNodes().remove(arquivo);
 					JOptionPane.showMessageDialog(null, "Arquivo removido com sucesso!", "Remover arquivo", JOptionPane.INFORMATION_MESSAGE);
@@ -408,6 +404,7 @@ public class PrincipalView extends JFrame {
 		
 		list = new JList<Character>();
 		list.setForeground(Color.BLACK);
+		list.setCellRenderer(new CellRenderer());
 		list.setVisibleRowCount(1);
 		list.setAutoscrolls(false);
 		list.setEnabled(false);
@@ -454,4 +451,17 @@ public class PrincipalView extends JFrame {
 	public DefaultListModel<Character> getListModel(){
 		return modelList;
 	}
+}
+
+class CellRenderer extends DefaultListCellRenderer {
+    public Component getListCellRendererComponent(JList list,Object value,int index,boolean isSelected,boolean cellHasFocus) {
+        Component c = super.getListCellRendererComponent(list,value,index,isSelected,cellHasFocus);
+        if(index%2 == 0) {
+            c.setBackground(Color.yellow);
+        }
+        else {
+            c.setBackground(Color.white);
+        }
+        return c;
+    }
 }
