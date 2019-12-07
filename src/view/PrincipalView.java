@@ -460,18 +460,18 @@ public class PrincipalView extends JFrame {
 
 class CellRenderer extends DefaultListCellRenderer {
 	boolean colore = false;
+	
     public Component getListCellRendererComponent(JList list,Object value,int index,boolean isSelected,boolean cellHasFocus) {
         Component c = super.getListCellRendererComponent(list,value,index,isSelected,cellHasFocus);
-        
         if(colore) {
             c.setBackground(Color.yellow);
-            if(index % 4 == 3) {
+            if(index % (Main.getDisco().getTamanhoBloco()) == ((Main.getDisco().getTamanhoBloco()-1))) {
             	colore = false;
             }
         }
         else {
             c.setBackground(Color.white); 
-            if(index % 4 == 3) {
+            if(index % (Main.getDisco().getTamanhoBloco()) == ((Main.getDisco().getTamanhoBloco()-1))) {
             	colore = true;
             }
         }
