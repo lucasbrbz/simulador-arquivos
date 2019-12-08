@@ -183,6 +183,10 @@ public class PrincipalView extends JFrame {
 					while(referencias[k] != -1) {
 						Main.getListaBlocos().add(new Bloco(referencias[k]));
 						Main.montaTabelaBlocos(true);
+						for(int j=referencias[k];(j%Main.getDisco().getTamanhoBloco() != 0 || j%Main.getDisco().getTamanhoBloco() == 0) && j<Main.getDisco().getTamanho();j++) {
+							Main.getDisco().getVetorDisco()[j] = '-';
+							modelList.setElementAt('-',j);
+						}
 						k++;
 					}
 					k = 0;
@@ -190,19 +194,20 @@ public class PrincipalView extends JFrame {
 						for(int i=posicaoTexto,j=(referencias[0] != -1) ? referencias[k] : 0;i<texto.length();i++,j++) {
 							Main.getDisco().getVetorDisco()[j] = texto.charAt(i);
 							modelList.setElementAt(texto.charAt(i),j);
-							if(i == texto.length() - 1) terminou = true;
+							if(i == texto.length() - 1) {
+								terminou = true;
+								break;
+							}
 							if((i+1)%Main.getDisco().getTamanhoBloco() == 0) {
 								posicaoTexto = i+1;
 								break;
 							}
 						}
+						if(terminou) break;
 						k++;
 						Main.getListaBlocos().remove(0);
 						Main.montaTabelaBlocos(true);
-						Main.getDisco().getTabelaNodes().get(arquivo).addReferencia(Main.getListaBlocos().get(0).getPosicao());
-						if(terminou) {
-							break;
-						}					
+						Main.getDisco().getTabelaNodes().get(arquivo).addReferencia(Main.getListaBlocos().get(0).getPosicao());				
 					}
 					Main.getDisco().getTabelaNodes().get(arquivo).setTamanho(texto.length());
 					for(int i=0;i<table.getRowCount();i++) {
@@ -216,6 +221,7 @@ public class PrincipalView extends JFrame {
 					}
 					table.revalidate();
 				} catch (Exception e1) {
+					e1.printStackTrace();
 					JOptionPane.showMessageDialog(null, "Não há arquivos no sistema!", "Erro", JOptionPane.ERROR_MESSAGE);
 				}
 			}
@@ -492,7 +498,7 @@ class CellRenderer extends DefaultListCellRenderer {
             }
         }
         else {
-            c.setBackground(Color.white); 
+            c.setBackground(Color.cyan); 
             if(index % (Main.getDisco().getTamanhoBloco()) == ((Main.getDisco().getTamanhoBloco()-1))) {
             	colore = true;
             }

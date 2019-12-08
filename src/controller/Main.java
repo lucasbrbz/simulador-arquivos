@@ -113,7 +113,8 @@ public class Main {
 	
 	public static void montaTabelaBlocos(boolean flag) {
 		if(flag) {
-			for(int i=0;i<=listaBlocos.size();i++) {
+			int tam = principalFrame.getTabelaBlocos().getRowCount();
+			for(int i=0;i<tam;i++) {
 				principalFrame.getTabelaBlocosModel().removeRow(0);
 			}
 		}
