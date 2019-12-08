@@ -2,7 +2,6 @@ package view;
 
 import controller.Main;
 import model.*;
-
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
@@ -33,8 +32,12 @@ import javax.swing.SwingConstants;
 import java.awt.Color;
 import java.awt.Component;
 
-
-
+/**
+ * Classe que implementa o frame principal do programa e suas principais funcionalidades
+ * @author Lucas
+ * @author Pedro
+ *
+ */
 public class PrincipalView extends JFrame {
 
 	private JPanel contentPane;
@@ -44,7 +47,9 @@ public class PrincipalView extends JFrame {
 	private DefaultTableModel model,modelTableBlocos;
 	private JTextField textFieldTamanhoDisco,textFieldTamanhoBloco;
 	
-
+	/**
+	 * Construtor do frame
+	 */
 	public PrincipalView() {
 		setTitle("Simulador de Sistema de Arquivos");
 		setResizable(false);
@@ -55,7 +60,6 @@ public class PrincipalView extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		
 		
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.setBounds(0, 0, 431, 21);
@@ -99,6 +103,10 @@ public class PrincipalView extends JFrame {
 		JMenu mnArquivo = new JMenu("Arquivo");
 		menuBar.add(mnArquivo);
 		
+		/**
+		 * Função Criar arquivo: permite ao usuário criar um arquivo, definir sua permissão e possibilita sua edição
+		 * de modo que altera o tamanho do i-node atrelado a ele e escreve seu conteúdo no disco rígido
+		 */
 		JMenuItem mntmCriarArquivo = new JMenuItem("Criar arquivo");
 		mntmCriarArquivo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -163,6 +171,10 @@ public class PrincipalView extends JFrame {
 		});
 		mnArquivo.add(mntmCriarArquivo);
 		
+		/**
+		 * Função Editar arquivo: permite ao usuário inserir ou alterar o conteúdo de um arquivo
+		 * de modo que altera o tamanho do i-node atrelado a ele e escreve seu conteúdo no disco rígido
+		 */
 		JMenuItem mntmEditarArquivo = new JMenuItem("Editar arquivo");
 		mntmEditarArquivo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -228,6 +240,9 @@ public class PrincipalView extends JFrame {
 		});
 		mnArquivo.add(mntmEditarArquivo);
 		
+		/**
+		 * Função Remover arquivo: permite ao usuário remover arquivos criados por ele, assim removendo seu conteúdo do disco rígido
+		 */
 		JMenuItem mntmRemoverArquivo = new JMenuItem("Remover arquivo");
 		mntmRemoverArquivo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -293,6 +308,10 @@ public class PrincipalView extends JFrame {
 		JMenu mnDisco = new JMenu("Disco");
 		menuBar.add(mnDisco);
 		
+		/**
+		 * Função Formatar disco: permite ao usuário escolher novos tamanhos de disco e
+		 * bloco, assim limpando todo o disco rígido e aplicando as novas configurações
+		 */
 		JMenuItem mntmFormatarDisco = new JMenuItem("Formatar disco");
 		mntmFormatarDisco.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -326,6 +345,9 @@ public class PrincipalView extends JFrame {
 		JMenu mnSimulador = new JMenu("Simulador");
 		menuBar.add(mnSimulador);
 		
+		/**
+		 * Função Salvar estado atual: permite ao usuário salvar seu disco rígido atual em um arquivo
+		 */
 		JMenuItem mntmSalvarEstadoAtual = new JMenuItem("Salvar estado atual");
 		mntmSalvarEstadoAtual.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -347,6 +369,10 @@ public class PrincipalView extends JFrame {
 		});
 		mnSimulador.add(mntmSalvarEstadoAtual);
 		
+		/**
+		 * Função Carregar de um arquivo: permite que o usuário importe o
+		 * disco rígido a partir de um arquivo previamente salvo por ele
+		 */
 		JMenuItem mntmCarregarDeUm = new JMenuItem("Carregar de um arquivo");
 		mntmCarregarDeUm.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -442,6 +468,10 @@ public class PrincipalView extends JFrame {
 		contentPane.add(scrollPaneList);
 	}
 	
+	/**
+	 * Método responsável por transformar o keyset da tabela de arquivos/i-nodes em um array de keys
+	 * @return Array de opções para utilização em comboboxes
+	 */
 	public String[] carregaTabela() {
 		String[] opcoes = new String[Main.getDisco().getTabelaNodes().size()];	
         int i = 0;
@@ -452,6 +482,10 @@ public class PrincipalView extends JFrame {
 		return opcoes;
 	}
 	
+	/**
+	 * Método responsável por adicionar uma entrada na tabela de visualização de arquivos/i-nodes
+	 * @param arquivo Nome do arquivo a ser adicionado
+	 */
 	public void adicionaFrameTabela(String arquivo) {
 		model.addRow(new Object[]{
 			arquivo,
@@ -486,9 +520,17 @@ public class PrincipalView extends JFrame {
 	}
 }
 
+/**
+ * Classe responsável por colorir os blocos na visualização do disco rígido (JList)
+ * @author Pedro
+ *
+ */
 class CellRenderer extends DefaultListCellRenderer {
 	boolean colore = false;
 	
+	/**
+	 * Método responsável por colorir as células do JList de acordo com o tamanho dos blocos 
+	 */
     public Component getListCellRendererComponent(JList list,Object value,int index,boolean isSelected,boolean cellHasFocus) {
         Component c = super.getListCellRendererComponent(list,value,index,isSelected,cellHasFocus);
         if(colore) {

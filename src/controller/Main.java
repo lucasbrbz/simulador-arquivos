@@ -12,12 +12,22 @@ import model.Bloco;
 import model.HD;
 import view.PrincipalView;
 
+/**
+ * Classe principal que gerencia/controla os frames e funcionalidades gerais
+ * @author Lucas
+ * @author Pedro
+ *
+ */
 public class Main {
 	
 	private static PrincipalView principalFrame = new PrincipalView();
 	private static ArrayList<Bloco> listaBlocos = new ArrayList<Bloco>();
 	private static HD disco;
 
+	/**
+	 * Realiza a chamada do frame principal e cria/carrega o arquivo disco rígido
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		principalFrame.setVisible(true);
 		if(!(new File("./disco.dat")).exists()) {
@@ -94,15 +104,26 @@ public class Main {
 		return listaBlocos;
 	}
 	
+	/**
+	 * Método responsável por passar um objeto HD lido do arquivo para um objeto HD de tempo de execução
+	 * @param discoArquivo Objeto desserializado lido do arquivo que necessitará de um cast
+	 */
 	public static void configuraDisco(Object discoArquivo) {
 		 disco = (HD) discoArquivo;
 	}
 	
+	/**
+	 * Método responsável por atualizar o texto exibido nos campos tamanho do HD e tamanho do bloco,
+	 * que será chamado apenas quando houver formatação de disco ou carregamento a partir de arquivo
+	 */
 	public static void atualizaTextField() {
 		principalFrame.getTextFieldTamanho().setText(Integer.toString(disco.getTamanho()));
 		principalFrame.getTextFieldTamanhoBloco().setText(Integer.toString(disco.getTamanhoBloco()));
 	}
 	
+	/**
+	 * Método responsável por popular a lista de blocos, configurando sua posição de maneira dinâmica
+	 */
 	public static void preencheListaBlocos() {
 		listaBlocos = new ArrayList<Bloco>();
 		for(int i=0;i<disco.getNumBlocos();i++) {
@@ -111,6 +132,10 @@ public class Main {
 		}
 	}
 	
+	/**
+	 * Montador da tabela de blocos livres
+	 * @param flag Variável para saber se deverá limpar e repopular a tabela
+	 */
 	public static void montaTabelaBlocos(boolean flag) {
 		if(flag) {
 			int tam = principalFrame.getTabelaBlocos().getRowCount();
@@ -132,6 +157,10 @@ public class Main {
 		}
 	}
 	
+	/**
+	 * Montador da lista de visualização do HD
+	 * @param flag Variável para saber se deverá limpar e repopular a lista
+	 */
 	public static void montaJList(boolean flag) {
 		principalFrame.getJList().setSize(disco.getTamanho(),1);
 		if(flag) principalFrame.getListModel().removeAllElements();;
