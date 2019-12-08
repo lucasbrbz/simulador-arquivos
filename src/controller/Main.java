@@ -27,6 +27,7 @@ public class Main {
 				tBloco = Integer.parseInt(JOptionPane.showInputDialog(null,"Tamanho dos blocos:","Criar disco rígido",JOptionPane.INFORMATION_MESSAGE));
 				disco = new HD(tamanho,tBloco);
 				preencheListaBlocos();
+				montaTabelaBlocos(false);
 				JFileChooser chooser = new JFileChooser("./");
 				chooser.setSelectedFile(new File("./disco.dat"));
 			    if(chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
@@ -50,6 +51,7 @@ public class Main {
 	    	    Main.configuraDisco(o.readObject());
 	    	    o.close();
 	    	    preencheListaBlocos();
+	    	    montaTabelaBlocos(false);
 	    	    montaJList(false);
 	    	    principalFrame.getJList().setSize(disco.getTamanho(),1);
 				Main.getDisco().getTabelaNodes().forEach((k,v) -> {
@@ -106,6 +108,26 @@ public class Main {
 		for(int i=0;i<disco.getNumBlocos();i++) {
 			Bloco b = new Bloco(i*Main.getDisco().getTamanhoBloco());
 			listaBlocos.add(b);
+		}
+	}
+	
+	public static void montaTabelaBlocos(boolean flag) {
+		if(flag) {
+			for(int i=0;i<=listaBlocos.size();i++) {
+				principalFrame.getTabelaBlocosModel().removeRow(0);
+			}
+		}
+		principalFrame.getTabelaBlocos().revalidate();
+		for(int i=0;i<listaBlocos.size();i++) {
+			int count = 0;
+			for(int j=i+1;j<listaBlocos.size();j++) {
+				count++;
+			}
+			principalFrame.getTabelaBlocosModel().addRow(new Object[] {
+					i,
+					listaBlocos.get(i).getPosicao(),
+					count
+			});
 		}
 	}
 	

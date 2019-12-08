@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -27,6 +28,8 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import java.awt.Font;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+
 import java.awt.Color;
 import java.awt.Component;
 
@@ -136,7 +139,8 @@ public class PrincipalView extends JFrame {
 									break;
 								}
 							}
-							Main.getListaBlocos().remove(b);
+							Main.getListaBlocos().remove(0);
+							Main.montaTabelaBlocos(true);
 						}
 						Main.getDisco().getTabelaNodes().put(arquivo, inode);
 						JOptionPane.showMessageDialog(contentPane, "Arquivo criado com sucesso!", "Criar arquivo", JOptionPane.INFORMATION_MESSAGE);
@@ -144,6 +148,8 @@ public class PrincipalView extends JFrame {
 					}
 					else if(editar == 1) {
 						Node inode = new Node(0,permissao);
+						Main.getListaBlocos().remove(0);
+						Main.montaTabelaBlocos(true);
 						Main.getDisco().getTabelaNodes().put(arquivo, inode);
 						JOptionPane.showMessageDialog(contentPane, "Arquivo criado com sucesso!", "Criar arquivo", JOptionPane.INFORMATION_MESSAGE);
 						adicionaFrameTabela(arquivo);
@@ -176,6 +182,7 @@ public class PrincipalView extends JFrame {
 					}
 					while(referencias[k] != -1) {
 						Main.getListaBlocos().add(new Bloco(referencias[k]));
+						Main.montaTabelaBlocos(true);
 						k++;
 					}
 					k = 0;
@@ -191,6 +198,7 @@ public class PrincipalView extends JFrame {
 						}
 						k++;
 						Main.getListaBlocos().remove(0);
+						Main.montaTabelaBlocos(true);
 						Main.getDisco().getTabelaNodes().get(arquivo).addReferencia(Main.getListaBlocos().get(0).getPosicao());
 						if(terminou) {
 							break;
@@ -241,6 +249,7 @@ public class PrincipalView extends JFrame {
 							}
 						}
 						Main.getListaBlocos().add(new Bloco(referencias[k]));
+						Main.montaTabelaBlocos(true);
 						if(terminou) break;
 						else {
 							Node inode = new Node(tamanhoTexto,Main.getDisco().getTabelaNodes().get(arquivo).getPermissao());
@@ -357,6 +366,7 @@ public class PrincipalView extends JFrame {
 								for(Bloco b : Main.getListaBlocos()) {
 									if(b.getPosicao() == referencias[i]) {
 										Main.getListaBlocos().remove(b);
+										Main.montaTabelaBlocos(true);
 										break;
 									}
 								}
@@ -386,6 +396,11 @@ public class PrincipalView extends JFrame {
 		table.getTableHeader().setReorderingAllowed(false);
 		table.setAutoscrolls(false);
 		table.setEnabled(false);
+		DefaultTableCellRenderer tableCenterRenderer = new DefaultTableCellRenderer();
+		tableCenterRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+		for(int i=0;i<4;i++) {
+			table.getColumnModel().getColumn(i).setCellRenderer(tableCenterRenderer);
+		}
 		model = (DefaultTableModel) table.getModel();
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setBounds(10, 294, 411, 118);
@@ -396,7 +411,12 @@ public class PrincipalView extends JFrame {
 		tableBlocos.getTableHeader().setReorderingAllowed(false);
 		tableBlocos.setRowSelectionAllowed(false);
 		tableBlocos.setAutoscrolls(false);
-		tableBlocos.setEnabled(false);
+		tableBlocos.setEnabled(false);	
+		DefaultTableCellRenderer tableBlocosCenterRenderer = new DefaultTableCellRenderer();
+		tableBlocosCenterRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+		for(int i=0;i<3;i++) {
+			tableBlocos.getColumnModel().getColumn(i).setCellRenderer(tableBlocosCenterRenderer);
+		}
 		modelTableBlocos = (DefaultTableModel) tableBlocos.getModel();
 		JScrollPane scrollPaneBlocos = new JScrollPane(tableBlocos);
 		scrollPaneBlocos.setBounds(10, 165, 411, 118);
@@ -441,6 +461,14 @@ public class PrincipalView extends JFrame {
 	
 	public JTextField getTextFieldTamanhoBloco() {
 		return textFieldTamanhoBloco;
+	}
+	
+	public JTable getTabelaBlocos() {
+		return tableBlocos;
+	}
+	
+	public DefaultTableModel getTabelaBlocosModel() {
+		return modelTableBlocos;
 	}
 	
 	public JList<Character> getJList(){
