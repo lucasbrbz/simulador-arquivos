@@ -233,7 +233,6 @@ public class PrincipalView extends JFrame {
 					}
 					table.revalidate();
 				} catch (Exception e1) {
-					e1.printStackTrace();
 					JOptionPane.showMessageDialog(null, "Não há arquivos no sistema!", "Erro", JOptionPane.ERROR_MESSAGE);
 				}
 			}
@@ -361,7 +360,6 @@ public class PrincipalView extends JFrame {
 			    	    o.close();
 			    	    JOptionPane.showMessageDialog(null, "Salvo com sucesso!","Sucesso", JOptionPane.INFORMATION_MESSAGE);
 			    	} catch(Exception ex) {
-			    		ex.printStackTrace();
 			    		JOptionPane.showMessageDialog(null, "Impossível salvar arquivo!", "Erro", JOptionPane.ERROR_MESSAGE);
 			        }
 			    }

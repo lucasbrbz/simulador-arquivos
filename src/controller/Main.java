@@ -43,7 +43,6 @@ public class Main {
 			    if(chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
 			    	FileOutputStream f = new FileOutputStream(chooser.getSelectedFile());
 			    	ObjectOutputStream o = new ObjectOutputStream(f);
-			    	disco.setTabelaNodes(disco.getTabelaNodes());
 			    	o.writeObject(disco);
 			    	o.flush();
 			    	o.close();

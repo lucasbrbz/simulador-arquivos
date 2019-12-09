@@ -66,7 +66,7 @@ public class Node implements Serializable {
 	 */
 	public void setDataModificacao() {
 		Calendar c = Calendar.getInstance();
-		this.ultimamodificacao = c.get(Calendar.DATE) + "/" + (c.get(Calendar.MONTH)+1) + "/" + c.get(Calendar.YEAR);;
+		this.ultimamodificacao = c.get(Calendar.DATE) + "/" + (c.get(Calendar.MONTH)+1) + "/" + c.get(Calendar.YEAR);
 	}
 	
 }
