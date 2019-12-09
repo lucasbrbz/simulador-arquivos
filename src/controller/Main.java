@@ -43,16 +43,16 @@ public class Main {
 			    if(chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
 			    	FileOutputStream f = new FileOutputStream(chooser.getSelectedFile());
 			    	ObjectOutputStream o = new ObjectOutputStream(f);
-			    	Main.getDisco().setTabelaNodes(Main.getDisco().getTabelaNodes());
-			    	o.writeObject(Main.getDisco());
+			    	disco.setTabelaNodes(disco.getTabelaNodes());
+			    	o.writeObject(disco);
 			    	o.flush();
 			    	o.close();
 			    	montaJList(false);
 					atualizaTextField();
-			    	JOptionPane.showMessageDialog(null,"Disco criado com sucesso!","Sucesso", JOptionPane.INFORMATION_MESSAGE);
+			    	JOptionPane.showMessageDialog(null,"Disco criado com sucesso!","Sucesso",JOptionPane.INFORMATION_MESSAGE);
 			    } else throw new Exception();
 			} catch(Exception ex) {
-	    		JOptionPane.showMessageDialog(null, "Impossível criar o disco!", "Erro", JOptionPane.ERROR_MESSAGE);
+	    		JOptionPane.showMessageDialog(null,"Impossível criar o disco!","Erro",JOptionPane.ERROR_MESSAGE);
 	        }
 		}
 		else {
@@ -63,8 +63,7 @@ public class Main {
 	    	    preencheListaBlocos();
 	    	    montaTabelaBlocos(false);
 	    	    montaJList(false);
-	    	    principalFrame.getJList().setSize(disco.getTamanho(),1);
-				Main.getDisco().getTabelaNodes().forEach((k,v) -> {
+				disco.getTabelaNodes().forEach((k,v) -> {
 					principalFrame.adicionaFrameTabela(k);
 					int[] referencias = v.getReferencias();
 					int i = 0;
@@ -125,9 +124,8 @@ public class Main {
 	 * Método responsável por popular a lista de blocos, configurando sua posição de maneira dinâmica
 	 */
 	public static void preencheListaBlocos() {
-		listaBlocos = new ArrayList<Bloco>();
 		for(int i=0;i<disco.getNumBlocos();i++) {
-			Bloco b = new Bloco(i*Main.getDisco().getTamanhoBloco());
+			Bloco b = new Bloco(i*disco.getTamanhoBloco());
 			listaBlocos.add(b);
 		}
 	}
